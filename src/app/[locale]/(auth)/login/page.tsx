@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoginForm } from '@/components/auth/LoginForm';
 
 export default function LoginPage() {
   const t = useTranslations('auth.login');
@@ -11,7 +12,7 @@ export default function LoginPage() {
           <CardTitle className="text-center text-brand-burgundy">{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground">Formulario de login — próximamente</p>
+          <LoginForm />
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RegisterForm } from '@/components/auth/RegisterForm';
 
 export default function RegisterPage() {
   const t = useTranslations('auth.register');
@@ -11,7 +12,7 @@ export default function RegisterPage() {
           <CardTitle className="text-center text-brand-burgundy">{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground">Formulario de registro — próximamente</p>
+          <RegisterForm />
         </CardContent>
       </Card>
     </div>
