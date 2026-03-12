@@ -1,0 +1,156 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "catalog": "Catálogo",
+    "cart": "Carrito",
+    "orders": "Mis Pedidos",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "admin": "Administración"
+  },
+  "home": {
+    "hero": {
+      "title": "Amy Rose Bakery",
+      "subtitle": "Delicias artesanales hechas con amor",
+      "cta": "Ver Catálogo"
+    },
+    "featured": "Productos Destacados",
+    "categories": "Nuestras Categorías"
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "filters": "Filtros",
+    "noResults": "No se encontraron productos",
+    "addToCart": "Agregar al carrito",
+    "outOfStock": "Sin stock",
+    "featured": "Destacado"
+  },
+  "product": {
+    "description": "Descripción",
+    "variants": "Tamaño",
+    "addToCart": "Agregar al carrito",
+    "quantity": "Cantidad",
+    "stock": "en stock",
+    "outOfStock": "Sin stock disponible"
+  },
+  "cart": {
+    "title": "Carrito",
+    "empty": "Tu carrito está vacío",
+    "emptyDescription": "Explorá nuestro catálogo y agregá productos",
+    "browseCatalog": "Ver catálogo",
+    "subtotal": "Subtotal",
+    "delivery": "Envío",
+    "total": "Total",
+    "checkout": "Finalizar compra",
+    "remove": "Eliminar",
+    "quantity": "Cantidad"
+  },
+  "checkout": {
+    "title": "Finalizar Compra",
+    "address": "Dirección de entrega",
+    "newAddress": "Nueva dirección",
+    "savedAddresses": "Mis direcciones",
+    "notes": "Notas del pedido",
+    "notesPlaceholder": "Instrucciones especiales, alergias, etc.",
+    "pay": "Pagar con MercadoPago",
+    "summary": "Resumen del pedido"
+  },
+  "checkout_success": {
+    "title": "¡Pedido confirmado!",
+    "description": "Gracias por tu compra. Te enviaremos actualizaciones sobre tu pedido.",
+    "orderId": "Número de pedido",
+    "viewOrder": "Ver pedido",
+    "continueShopping": "Seguir comprando"
+  },
+  "orders": {
+    "title": "Mis Pedidos",
+    "empty": "No tenés pedidos aún",
+    "status": {
+      "PENDING": "Pendiente",
+      "CONFIRMED": "Confirmado",
+      "PROCESSING": "En preparación",
+      "READY": "Listo",
+      "DELIVERED": "Entregado",
+      "CANCELLED": "Cancelado"
+    },
+    "date": "Fecha",
+    "total": "Total",
+    "items": "Productos",
+    "viewDetail": "Ver detalle"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "email": "Email",
+      "password": "Contraseña",
+      "submit": "Ingresar",
+      "noAccount": "¿No tenés cuenta?",
+      "register": "Registrate",
+      "continueWith": "O continuá con",
+      "google": "Continuar con Google"
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "name": "Nombre completo",
+      "email": "Email",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "phone": "Teléfono (opcional)",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tenés cuenta?",
+      "login": "Iniciá sesión"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Panel de Administración",
+      "revenue": "Ingresos totales",
+      "orders": "Pedidos",
+      "products": "Productos",
+      "customers": "Clientes"
+    },
+    "products": {
+      "title": "Productos",
+      "new": "Nuevo producto",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "name": "Nombre",
+      "category": "Categoría",
+      "variants": "Variantes",
+      "stock": "Stock",
+      "status": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "orders": {
+      "title": "Pedidos",
+      "customer": "Cliente",
+      "status": "Estado",
+      "total": "Total",
+      "date": "Fecha",
+      "updateStatus": "Actualizar estado"
+    },
+    "customers": {
+      "title": "Clientes",
+      "name": "Nombre",
+      "email": "Email",
+      "orders": "Pedidos",
+      "joined": "Registrado"
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Volver",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "Operación exitosa",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "confirm": "Confirmar"
+  }
+}

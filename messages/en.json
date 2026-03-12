@@ -1,0 +1,156 @@
+{
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "cart": "Cart",
+    "orders": "My Orders",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out",
+    "admin": "Administration"
+  },
+  "home": {
+    "hero": {
+      "title": "Amy Rose Bakery",
+      "subtitle": "Artisan delights made with love",
+      "cta": "Browse Catalog"
+    },
+    "featured": "Featured Products",
+    "categories": "Our Categories"
+  },
+  "catalog": {
+    "title": "Catalog",
+    "filters": "Filters",
+    "noResults": "No products found",
+    "addToCart": "Add to cart",
+    "outOfStock": "Out of stock",
+    "featured": "Featured"
+  },
+  "product": {
+    "description": "Description",
+    "variants": "Size",
+    "addToCart": "Add to cart",
+    "quantity": "Quantity",
+    "stock": "in stock",
+    "outOfStock": "Out of stock"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "emptyDescription": "Browse our catalog and add some products",
+    "browseCatalog": "Browse catalog",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "quantity": "Quantity"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "address": "Delivery address",
+    "newAddress": "New address",
+    "savedAddresses": "Saved addresses",
+    "notes": "Order notes",
+    "notesPlaceholder": "Special instructions, allergies, etc.",
+    "pay": "Pay with MercadoPago",
+    "summary": "Order summary"
+  },
+  "checkout_success": {
+    "title": "Order confirmed!",
+    "description": "Thank you for your purchase. We'll send you updates about your order.",
+    "orderId": "Order number",
+    "viewOrder": "View order",
+    "continueShopping": "Continue shopping"
+  },
+  "orders": {
+    "title": "My Orders",
+    "empty": "You have no orders yet",
+    "status": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "PROCESSING": "Processing",
+      "READY": "Ready",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled"
+    },
+    "date": "Date",
+    "total": "Total",
+    "items": "Items",
+    "viewDetail": "View details"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up",
+      "continueWith": "Or continue with",
+      "google": "Continue with Google"
+    },
+    "register": {
+      "title": "Create Account",
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "phone": "Phone (optional)",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "revenue": "Total revenue",
+      "orders": "Orders",
+      "products": "Products",
+      "customers": "Customers"
+    },
+    "products": {
+      "title": "Products",
+      "new": "New product",
+      "edit": "Edit",
+      "delete": "Delete",
+      "name": "Name",
+      "category": "Category",
+      "variants": "Variants",
+      "stock": "Stock",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "orders": {
+      "title": "Orders",
+      "customer": "Customer",
+      "status": "Status",
+      "total": "Total",
+      "date": "Date",
+      "updateStatus": "Update status"
+    },
+    "customers": {
+      "title": "Customers",
+      "name": "Name",
+      "email": "Email",
+      "orders": "Orders",
+      "joined": "Joined"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "confirm": "Confirm"
+  }
+}
