@@ -1,0 +1,72 @@
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  Index,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
+
+export enum UserRole {
+  CUSTOMER = 'customer',
+  ADMIN = 'admin',
+}
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Index()
+  @Column({
+    unique: true,
+    transformer: {
+      to: (val: string) => val?.toLowerCase(),
+      from: (val: string) => val,
+    },
+  })
+  email!: string;
+
+  /** Never returned in responses — loaded only when explicitly selected */
+  @Exclude()
+  @Column({ nullable: true, select: false })
+  password?: string;
+
+  @Column({ nullable: true })
+  name?: string;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
+  role!: UserRole;
+
+  @Column({ default: true })
+  isActive!: boolean;
+
+  @Column({ nullable: true })
+  phone?: string;
+
+  /** Stored as bcrypt hash — never exposed in responses */
+  @Exclude()
+  @Column({ nullable: true, select: false })
+  refreshToken?: string;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  normalizeEmail(): void {
+    if (this.email) {
+      this.email = this.email.toLowerCase().trim();
+    }
+  }
+}
