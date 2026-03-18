@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 const geistSans = Geist({
@@ -12,6 +12,13 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+});
+
 export const metadata: Metadata = {
   title: 'Amy Rose Bakery',
   description: 'Delicias artesanales hechas con amor',
@@ -20,7 +27,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}>
         {children}
       </body>
     </html>

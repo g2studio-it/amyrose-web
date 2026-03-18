@@ -148,6 +148,12 @@
   --color-brand-lilac-light: var(--brand-lilac-light);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  /* Extended brand palette for header redesign */
+  --color-nav-purple: #3B1F5E;
+  --color-nav-burgundy: #6B1A2B;
+  --color-nav-lilac-bg: #F3EEF8;
+  --color-nav-lilac-divider: #D8C8E8;
 }
 
 * {
