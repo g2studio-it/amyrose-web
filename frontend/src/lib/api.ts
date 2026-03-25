@@ -20,7 +20,12 @@ async function apiFetch<T>(
   }
 
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  const json = await res.json();
+  // Unwrap NestJS TransformInterceptor envelope: { success, data, timestamp }
+  if (json && typeof json === 'object' && json.success === true && 'data' in json) {
+    return json.data as T;
+  }
+  return json as T;
 }
 
 export const api = {

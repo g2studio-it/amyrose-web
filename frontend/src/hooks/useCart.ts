@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import {
   addToCartAction,
@@ -10,6 +11,10 @@ import {
 import type { CartItemUI } from '@/types';
 
 export const useCart = () => {
+  useEffect(() => {
+    useCartStore.persist.rehydrate();
+  }, []);
+
   const items = useCartStore((s) => s.items);
   const storeAddItem = useCartStore((s) => s.addItem);
   const storeRemoveItem = useCartStore((s) => s.removeItem);
