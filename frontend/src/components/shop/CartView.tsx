@@ -16,7 +16,8 @@ interface CartViewProps {
 
 export function CartView({ locale }: CartViewProps) {
   const t = useTranslations('cart');
-  const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCart();
+  const { items, removeItem, updateQuantity, clearCart, totalPrice } =
+    useCart();
   const router = useRouter();
   const [isOrdering, setIsOrdering] = useState(false);
 
@@ -33,8 +34,13 @@ export function CartView({ locale }: CartViewProps) {
       router.push(`/${locale}/orders`);
       toast.success(`Pedido #${order.id.slice(0, 8)} creado con éxito`);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al crear el pedido';
-      toast.error(msg.includes('autenticado') ? 'Debés iniciar sesión para hacer un pedido' : msg);
+      const msg =
+        err instanceof Error ? err.message : 'Error al crear el pedido';
+      toast.error(
+        msg.includes('autenticado')
+          ? 'Debés iniciar sesión para hacer un pedido'
+          : msg
+      );
     } finally {
       setIsOrdering(false);
     }
@@ -42,13 +48,17 @@ export function CartView({ locale }: CartViewProps) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-        <ShoppingBag className="h-16 w-16 text-muted-foreground/40" />
-        <h2 className="text-xl font-semibold text-brand-burgundy">{t('empty')}</h2>
-        <p className="text-muted-foreground max-w-sm">{t('emptyDescription')}</p>
+      <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+        <ShoppingBag className="text-muted-foreground/40 h-16 w-16" />
+        <h2 className="text-brand-burgundy text-xl font-semibold">
+          {t('empty')}
+        </h2>
+        <p className="text-muted-foreground max-w-sm">
+          {t('emptyDescription')}
+        </p>
         <Link
           href={`/${locale}/catalog`}
-          className="mt-2 inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-brand-burgundy to-brand-violet text-white font-semibold hover:shadow-lg transition-all"
+          className="from-brand-burgundy to-brand-violet mt-2 inline-flex items-center gap-2 rounded-2xl bg-linear-to-r px-6 py-3 font-semibold text-white transition-all hover:shadow-lg"
         >
           {t('browseCatalog')}
         </Link>
@@ -57,28 +67,39 @@ export function CartView({ locale }: CartViewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Cart items */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="space-y-4 lg:col-span-2">
         {items.map((item) => (
           <div
             key={item.variantId}
-            className="flex gap-4 p-4 rounded-2xl border border-border bg-card"
+            className="border-border bg-card flex gap-4 rounded-2xl border p-4"
           >
             {/* Image */}
-            <div className="relative h-20 w-20 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
+            <div className="bg-muted relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl">
               {item.imageUrl ? (
-                <Image src={item.imageUrl} alt={item.productName} fill className="object-cover" />
+                <Image
+                  src={item.imageUrl}
+                  alt={item.productName}
+                  fill
+                  className="object-cover"
+                />
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-3xl">🎂</div>
+                <div className="flex h-full w-full items-center justify-center text-3xl">
+                  🎂
+                </div>
               )}
             </div>
 
             {/* Info */}
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-brand-burgundy truncate">{item.productName}</p>
-              <p className="text-sm text-muted-foreground">{item.variantName}</p>
-              <p className="text-sm font-semibold text-brand-violet mt-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-brand-burgundy truncate font-bold">
+                {item.productName}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {item.variantName}
+              </p>
+              <p className="text-brand-violet mt-1 text-sm font-semibold">
                 ${item.price.toLocaleString('es-AR')} c/u
               </p>
             </div>
@@ -93,29 +114,33 @@ export function CartView({ locale }: CartViewProps) {
                 <Trash2 className="h-4 w-4" />
               </button>
 
-              <div className="flex items-center rounded-xl border border-border overflow-hidden">
+              <div className="border-border flex items-center overflow-hidden rounded-xl border">
                 <button
-                  onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                  onClick={() =>
+                    updateQuantity(item.variantId, item.quantity - 1)
+                  }
                   disabled={item.quantity <= 1}
-                  className="px-2 py-1 hover:bg-muted transition-colors disabled:opacity-30"
+                  className="hover:bg-muted px-2 py-1 transition-colors disabled:opacity-30"
                   aria-label="Disminuir"
                 >
                   <Minus className="h-3 w-3" />
                 </button>
-                <span className="px-3 py-1 text-sm font-bold min-w-[2rem] text-center">
+                <span className="min-w-[2rem] px-3 py-1 text-center text-sm font-bold">
                   {item.quantity}
                 </span>
                 <button
-                  onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                  onClick={() =>
+                    updateQuantity(item.variantId, item.quantity + 1)
+                  }
                   disabled={item.quantity >= item.stock}
-                  className="px-2 py-1 hover:bg-muted transition-colors disabled:opacity-30"
+                  className="hover:bg-muted px-2 py-1 transition-colors disabled:opacity-30"
                   aria-label="Aumentar"
                 >
                   <Plus className="h-3 w-3" />
                 </button>
               </div>
 
-              <p className="text-sm font-bold text-brand-burgundy">
+              <p className="text-brand-burgundy text-sm font-bold">
                 ${(item.price * item.quantity).toLocaleString('es-AR')}
               </p>
             </div>
@@ -125,36 +150,40 @@ export function CartView({ locale }: CartViewProps) {
 
       {/* Summary */}
       <div className="lg:col-span-1">
-        <div className="sticky top-24 rounded-2xl border border-border bg-card p-6 space-y-4">
-          <h2 className="text-lg font-bold text-brand-burgundy">Resumen</h2>
+        <div className="border-border bg-card sticky top-24 space-y-4 rounded-2xl border p-6">
+          <h2 className="text-brand-burgundy text-lg font-bold">Resumen</h2>
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('subtotal')}</span>
-              <span className="font-medium">${totalPrice.toLocaleString('es-AR')}</span>
+              <span className="font-medium">
+                ${totalPrice.toLocaleString('es-AR')}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('delivery')}</span>
               <span className="text-muted-foreground italic">A convenir</span>
             </div>
-            <div className="h-px bg-border" />
-            <div className="flex justify-between font-bold text-base">
+            <div className="bg-border h-px" />
+            <div className="flex justify-between text-base font-bold">
               <span>{t('total')}</span>
-              <span className="text-brand-burgundy">${totalPrice.toLocaleString('es-AR')}</span>
+              <span className="text-brand-burgundy">
+                ${totalPrice.toLocaleString('es-AR')}
+              </span>
             </div>
           </div>
 
           <button
             onClick={handleCheckout}
             disabled={isOrdering}
-            className="w-full py-3 rounded-2xl bg-gradient-to-r from-brand-burgundy to-brand-violet text-white font-bold hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="from-brand-burgundy to-brand-violet w-full rounded-2xl bg-gradient-to-r py-3 font-bold text-white transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isOrdering ? 'Procesando...' : t('checkout')}
           </button>
 
           <Link
             href={`/${locale}/catalog`}
-            className="block text-center text-sm text-muted-foreground hover:text-brand-violet transition-colors"
+            className="text-muted-foreground hover:text-brand-violet block text-center text-sm transition-colors"
           >
             {t('browseCatalog')}
           </Link>
