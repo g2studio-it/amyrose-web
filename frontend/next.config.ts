@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**.googleusercontent.com',
       },
+      // Unsplash (seed product images)
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
       // CDN / storage for product images (update hostname when deploying)
       {
         protocol: 'https',
