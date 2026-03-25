@@ -16,7 +16,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "npm run build && typeorm migration:generate -d dist/config/database.config.js",
     "migration:run": "npm run build && typeorm migration:run -d dist/config/database.config.js",
-    "migration:revert": "npm run build && typeorm migration:revert -d dist/config/database.config.js"
+    "migration:revert": "npm run build && typeorm migration:revert -d dist/config/database.config.js",
+    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",
