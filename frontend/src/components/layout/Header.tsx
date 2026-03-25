@@ -127,6 +127,15 @@ export function Header() {
                 onMouseLeave={closeDropdown}
                 role="menu"
               >
+                <Link
+                  href={`/${locale}/catalog`}
+                  role="menuitem"
+                  className="block px-5 py-3 font-serif text-sm font-semibold text-nav-purple hover:bg-nav-lilac-bg transition-colors duration-100"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Ver todos
+                </Link>
+                <div className="mx-4 h-px bg-nav-lilac-divider" />
                 {PRODUCT_CATEGORIES.map((item, i) => (
                   <div key={item.slug}>
                     <Link
@@ -264,6 +273,13 @@ export function Header() {
                 mobileProductsOpen ? 'max-h-80' : 'max-h-0'
               }`}
             >
+              <Link
+                href={`/${locale}/catalog`}
+                className="flex items-center gap-2 pl-8 pr-5 py-3 font-serif text-sm font-semibold text-nav-purple hover:bg-nav-lilac-bg border-l-2 border-nav-lilac-divider mx-4 mb-0.5 rounded-r-md transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                Ver todos
+              </Link>
               {PRODUCT_CATEGORIES.map((item) => (
                 <Link
                   key={item.slug}
