@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { api, type ApiProduct, type PaginatedResult } from '@/lib/api';
 import { ProductCard } from './ProductCard';
 
 interface SuggestedProductsProps {
@@ -12,36 +12,24 @@ export async function SuggestedProducts({
   categoryId,
   locale,
 }: SuggestedProductsProps) {
-  // First: same category; fill with other products if needed
-  const sameCategory = await prisma.product.findMany({
-    where: { isActive: true, categoryId, id: { not: currentProductId } },
-    include: {
-      images: { where: { isPrimary: true }, take: 1 },
-      variants: { where: { isActive: true }, orderBy: { price: 'asc' }, take: 1 },
-      category: true,
-    },
-    orderBy: [{ isFeatured: 'desc' }, { sortOrder: 'asc' }],
-    take: 4,
-  });
+  const { data: all } = await api.get<PaginatedResult<ApiProduct>>(
+    `/catalog/products?categoryId=${categoryId}&limit=10`,
+  );
 
-  let products = sameCategory;
+  // Same category, exclude current product
+  let products = all
+    .filter((p) => p.id !== currentProductId)
+    .slice(0, 4);
 
+  // Fill up to 4 from other categories if needed
   if (products.length < 4) {
-    const others = await prisma.product.findMany({
-      where: {
-        isActive: true,
-        categoryId: { not: categoryId },
-        id: { not: currentProductId },
-      },
-      include: {
-        images: { where: { isPrimary: true }, take: 1 },
-        variants: { where: { isActive: true }, orderBy: { price: 'asc' }, take: 1 },
-        category: true,
-      },
-      orderBy: [{ isFeatured: 'desc' }, { sortOrder: 'asc' }],
-      take: 4 - products.length,
-    });
-    products = [...products, ...others];
+    const { data: others } = await api.get<PaginatedResult<ApiProduct>>(
+      `/catalog/products?limit=10`,
+    );
+    const fill = others
+      .filter((p) => p.id !== currentProductId && p.categoryId !== categoryId)
+      .slice(0, 4 - products.length);
+    products = [...products, ...fill];
   }
 
   if (products.length === 0) return null;
@@ -64,8 +52,11 @@ export async function SuggestedProducts({
       {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         {products.map((product) => {
-          const minPrice = Number(product.variants[0]?.price ?? 0);
-          const imageUrl = product.images[0]?.url;
+          const activeVariants = product.variants.filter((v) => v.isActive);
+          const minPrice = activeVariants.length
+            ? Math.min(...activeVariants.map((v) => v.price))
+            : 0;
+          const imageUrl = product.images.find((i) => i.isPrimary)?.url ?? product.images[0]?.url;
           return (
             <ProductCard
               key={product.id}
@@ -76,7 +67,7 @@ export async function SuggestedProducts({
               minPrice={minPrice}
               locale={locale}
               isFeatured={product.isFeatured}
-              variantCount={product.variants.length}
+              variantCount={activeVariants.length}
             />
           );
         })}

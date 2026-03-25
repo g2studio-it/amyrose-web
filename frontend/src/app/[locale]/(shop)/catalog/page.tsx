@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { prisma } from '@/lib/prisma';
+import { api, type ApiProduct, type PaginatedResult } from '@/lib/api';
 import { ProductCard } from '@/components/shop/ProductCard';
 
 interface Props {
@@ -10,18 +10,9 @@ export default async function CatalogPage({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations('catalog');
 
-  const products = await prisma.product.findMany({
-    where: { isActive: true },
-    include: {
-      images: { where: { isPrimary: true }, take: 1 },
-      variants: {
-        where: { isActive: true },
-        orderBy: { price: 'asc' },
-      },
-      category: true,
-    },
-    orderBy: [{ isFeatured: 'desc' }, { sortOrder: 'asc' }],
-  });
+  const { data: products } = await api.get<PaginatedResult<ApiProduct>>(
+    '/catalog/products?limit=100',
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,10 +40,11 @@ export default async function CatalogPage({ params }: Props) {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {products.map((product) => {
-              const minPrice = Math.min(
-                ...product.variants.map((v) => Number(v.price))
-              );
-              const imageUrl = product.images[0]?.url;
+              const activeVariants = product.variants.filter((v) => v.isActive);
+              const minPrice = activeVariants.length
+                ? Math.min(...activeVariants.map((v) => v.price))
+                : 0;
+              const imageUrl = product.images.find((i) => i.isPrimary)?.url ?? product.images[0]?.url;
               return (
                 <ProductCard
                   key={product.id}
@@ -60,10 +52,10 @@ export default async function CatalogPage({ params }: Props) {
                   name={product.name}
                   categoryName={product.category.name}
                   imageUrl={imageUrl}
-                  minPrice={isFinite(minPrice) ? minPrice : 0}
+                  minPrice={minPrice}
                   locale={locale}
                   isFeatured={product.isFeatured}
-                  variantCount={product.variants.length}
+                  variantCount={activeVariants.length}
                 />
               );
             })}
@@ -73,4 +65,3 @@ export default async function CatalogPage({ params }: Props) {
     </div>
   );
 }
-

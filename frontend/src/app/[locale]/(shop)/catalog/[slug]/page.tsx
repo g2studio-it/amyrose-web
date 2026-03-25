@@ -4,7 +4,7 @@ import { ChevronRight, Home } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-import { prisma } from '@/lib/prisma';
+import { api, type ApiProduct } from '@/lib/api';
 import { ImageSlider } from '@/components/shop/ImageSlider';
 import { ProductDetail } from '@/components/shop/ProductDetail';
 import { SuggestedProducts } from '@/components/shop/SuggestedProducts';
@@ -15,51 +15,39 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const product = await prisma.product.findUnique({
-    where: { slug, isActive: true },
-    select: { name: true, description: true },
-  });
-  if (!product) return { title: 'Producto no encontrado' };
-  return {
-    title: `${product.name} | Amy Rose Bakery`,
-    description: product.description ?? undefined,
-  };
+  try {
+    const product = await api.get<ApiProduct>(`/catalog/products/${slug}`);
+    return {
+      title: `${product.name} | Amy Rose Bakery`,
+      description: product.description ?? undefined,
+    };
+  } catch {
+    return { title: 'Producto no encontrado' };
+  }
 }
 
 export default async function ProductPage({ params }: Props) {
   const { locale, slug } = await params;
   const t = await getTranslations('product');
 
-  const product = await prisma.product.findUnique({
-    where: { slug, isActive: true },
-    include: {
-      images: { orderBy: { sortOrder: 'asc' } },
-      variants: {
-        where: { isActive: true },
-        orderBy: { sortOrder: 'asc' },
-      },
-      category: true,
-    },
-  });
+  let product: ApiProduct;
+  try {
+    product = await api.get<ApiProduct>(`/catalog/products/${slug}`);
+  } catch {
+    notFound();
+  }
 
-  if (!product) notFound();
+  const images = product.images
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((img) => ({ url: img.url, altText: img.altText }));
 
-  const images = product.images.map((img) => ({
-    url: img.url,
-    altText: img.altText,
-  }));
-
-  const variants = product.variants.map((v) => ({
-    id: v.id,
-    name: v.name,
-    price: Number(v.price),
-    stock: v.stock,
-  }));
+  const variants = product.variants
+    .filter((v) => v.isActive)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((v) => ({ id: v.id, name: v.name, price: v.price, stock: v.stock }));
 
   const primaryImage =
     product.images.find((i) => i.isPrimary)?.url ?? product.images[0]?.url;
-
-  const minPrice = Math.min(...variants.map((v) => v.price), 0);
 
   return (
     <div className="min-h-screen bg-background">
