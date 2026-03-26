@@ -13,7 +13,7 @@ env:
   NAMESPACE: amyrose
 
 jobs:
-  # ─── Build & Push Frontend ──────────────────────────────────────────────────
+  # ─── Build & Push Frontend + Migrator ──────────────────────────────────────
   build-frontend:
     name: "Build & Push Frontend"
     runs-on: arc-runner-dind
@@ -24,19 +24,31 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build image
+      - name: Build frontend image
         run: |
           docker build \
+            --target runner \
             --cache-from ${{ env.IMAGE }}:amyrose-frontend-latest \
             -t ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }} \
             -t ${{ env.IMAGE }}:amyrose-frontend-latest \
             -f frontend/Dockerfile \
             frontend/
 
-      - name: Push image
+      - name: Build migrator image
+        run: |
+          docker build \
+            --target migrator \
+            -t ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }} \
+            -t ${{ env.IMAGE }}:amyrose-migrator-latest \
+            -f frontend/Dockerfile \
+            frontend/
+
+      - name: Push images
         run: |
           docker push ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}
           docker push ${{ env.IMAGE }}:amyrose-frontend-latest
+          docker push ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }}
+          docker push ${{ env.IMAGE }}:amyrose-migrator-latest
 
   # ─── Build & Push Backend ───────────────────────────────────────────────────
   build-backend:
@@ -78,11 +90,19 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
+      - name: Ensure Docker Hub pull secret exists
+        run: |
+          kubectl -n ${{ env.NAMESPACE }} create secret docker-registry dockerhub-pull \
+            --docker-server=https://index.docker.io/v1/ \
+            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
+            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Run migration job
         run: |
           SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)
           export JOB_NAME="prisma-migrate-${SHORT_SHA}"
-          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}|" k8s/migration-job.yaml
+          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }}|" k8s/migration-job.yaml
           sed -i "s|\${CI_COMMIT_SHORT_SHA}|${SHORT_SHA}|g" k8s/migration-job.yaml
           kubectl apply -f k8s/migration-job.yaml
           kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=120s job/${JOB_NAME}
@@ -108,22 +128,29 @@ jobs:
           sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }}|" k8s/backend.yaml
 
       - name: Inject secrets into k8s manifests
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          AUTH_URL: ${{ secrets.AUTH_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-          MERCADOPAGO_ACCESS_TOKEN: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
-          MERCADOPAGO_WEBHOOK_SECRET: ${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}
-          NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}
         run: |
-          envsubst < k8s/secrets.yaml > k8s/secrets-rendered.yaml
+          cp k8s/secrets.yaml k8s/secrets-rendered.yaml
+          sed -i "s|\${DATABASE_URL}|${{ secrets.DATABASE_URL }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_HOST}|${{ secrets.DB_HOST }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_PORT}|${{ secrets.DB_PORT }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_USERNAME}|${{ secrets.DB_USERNAME }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_NAME}|${{ secrets.DB_NAME }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${AUTH_SECRET}|${{ secrets.AUTH_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${AUTH_URL}|${{ secrets.AUTH_URL }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${JWT_SECRET}|${{ secrets.JWT_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${JWT_REFRESH_SECRET}|${{ secrets.JWT_REFRESH_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${MERCADOPAGO_ACCESS_TOKEN}|${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${MERCADOPAGO_WEBHOOK_SECRET}|${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}|${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}|g" k8s/secrets-rendered.yaml
+
+      - name: Create Docker Hub pull secret
+        run: |
+          kubectl -n ${{ env.NAMESPACE }} create secret docker-registry dockerhub-pull \
+            --docker-server=https://index.docker.io/v1/ \
+            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
+            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Apply Kubernetes manifests
         run: |

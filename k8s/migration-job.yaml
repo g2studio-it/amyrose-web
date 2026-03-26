@@ -12,11 +12,10 @@ spec:
     spec:
       restartPolicy: Never
       imagePullSecrets:
-        - name: dockerhub-secret
+        - name: dockerhub-pull
       containers:
         - name: migrate
-          image: coddyshelby/g2studio:amyrose-frontend-latest
-          command: ["npx", "prisma", "migrate", "deploy"]
+          image: coddyshelby/g2studio:amyrose-migrator-latest
           env:
             - name: DATABASE_URL
               valueFrom:
