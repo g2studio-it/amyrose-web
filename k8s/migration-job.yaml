@@ -15,7 +15,7 @@ spec:
         - name: dockerhub-secret
       containers:
         - name: migrate
-          image: ${DOCKERHUB_USERNAME}/amyrose-frontend:latest
+          image: coddyshelby/g2studio:amyrose-frontend-latest
           command: ["npx", "prisma", "migrate", "deploy"]
           env:
             - name: DATABASE_URL
