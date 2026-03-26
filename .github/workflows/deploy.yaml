@@ -1,0 +1,155 @@
+# =============================================================================
+# Deploy to k3s — Build, push, and deploy Amy Rose to your VPS k3s cluster
+# =============================================================================
+name: "Deploy to k3s"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/amyrose
+  NAMESPACE: amyrose
+
+jobs:
+  # ─── Build & Push Frontend ──────────────────────────────────────────────────
+  build-frontend:
+    name: "Build & Push Frontend"
+    runs-on: arc-runner-dind
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build image
+        run: |
+          docker build \
+            --cache-from ${{ env.IMAGE }}:frontend-latest \
+            -t ${{ env.IMAGE }}:frontend-${{ github.sha }} \
+            -t ${{ env.IMAGE }}:frontend-latest \
+            -f frontend/Dockerfile \
+            frontend/
+
+      - name: Push image
+        run: |
+          docker push ${{ env.IMAGE }}:frontend-${{ github.sha }}
+          docker push ${{ env.IMAGE }}:frontend-latest
+
+  # ─── Build & Push Backend ───────────────────────────────────────────────────
+  build-backend:
+    name: "Build & Push Backend"
+    runs-on: arc-runner-dind
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build image
+        run: |
+          docker build \
+            --cache-from ${{ env.IMAGE }}:backend-latest \
+            -t ${{ env.IMAGE }}:backend-${{ github.sha }} \
+            -t ${{ env.IMAGE }}:backend-latest \
+            -f backend/Dockerfile \
+            backend/
+
+      - name: Push image
+        run: |
+          docker push ${{ env.IMAGE }}:backend-${{ github.sha }}
+          docker push ${{ env.IMAGE }}:backend-latest
+
+  # ─── Run Prisma Migrations ─────────────────────────────────────────────────
+  migrate:
+    name: "Run DB Migrations"
+    runs-on: arc-runner-org
+    needs: build-frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Run migration job
+        run: |
+          export JOB_NAME="prisma-migrate-$(echo ${{ github.sha }} | cut -c1-8)"
+          sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" k8s/migration-job.yaml
+          sed -i "s|\${CI_COMMIT_SHORT_SHA}|$(echo ${{ github.sha }} | cut -c1-8)|g" k8s/migration-job.yaml
+          kubectl apply -f k8s/migration-job.yaml
+          kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=120s job/${JOB_NAME}
+
+  # ─── Deploy to k3s ─────────────────────────────────────────────────────────
+  deploy:
+    name: "Deploy to k3s"
+    runs-on: arc-runner-org
+    needs: [build-frontend, build-backend, migrate]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Set image in manifests
+        run: |
+          sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" k8s/backend.yaml
+          sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" k8s/frontend.yaml
+          sed -i "s|:latest|:frontend-${{ github.sha }}|g" k8s/frontend.yaml
+          sed -i "s|:latest|:backend-${{ github.sha }}|g" k8s/backend.yaml
+
+      - name: Inject secrets into k8s manifests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          AUTH_URL: ${{ secrets.AUTH_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          MERCADOPAGO_ACCESS_TOKEN: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
+          MERCADOPAGO_WEBHOOK_SECRET: ${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}
+          NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}
+        run: |
+          envsubst < k8s/secrets.yaml > k8s/secrets-rendered.yaml
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/secrets-rendered.yaml
+          kubectl apply -f k8s/postgres.yaml
+          kubectl apply -f k8s/backend.yaml
+          kubectl apply -f k8s/frontend.yaml
+          kubectl apply -f k8s/ingress.yaml
+
+      - name: Wait for rollouts
+        run: |
+          kubectl rollout status deployment/backend -n ${{ env.NAMESPACE }} --timeout=120s
+          kubectl rollout status deployment/frontend -n ${{ env.NAMESPACE }} --timeout=120s
+
+      - name: Verify deployment
+        run: |
+          echo "=== Deployments ==="
+          kubectl get deployments -n ${{ env.NAMESPACE }}
+          echo ""
+          echo "=== Pods ==="
+          kubectl get pods -n ${{ env.NAMESPACE }}
+          echo ""
+          echo "=== Services ==="
+          kubectl get svc -n ${{ env.NAMESPACE }}
+          echo ""
+          echo "=== Ingress ==="
+          kubectl get ingress -n ${{ env.NAMESPACE }}
