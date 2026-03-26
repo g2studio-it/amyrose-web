@@ -5,7 +5,7 @@
  */
 
 import 'reflect-metadata';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import { User, UserRole } from '../modules/users/entities/user.entity';
