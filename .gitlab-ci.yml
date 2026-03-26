@@ -64,9 +64,6 @@ migrate:
     - docker
     - self-hosted
   image: bitnami/kubectl:latest
-  before_script:
-    - mkdir -p ~/.kube
-    - echo "${KUBECONFIG_CONTENT}" | base64 -d > ~/.kube/config
   script:
     - export JOB_NAME="prisma-migrate-${CI_COMMIT_SHORT_SHA}"
     - sed "s|\${DOCKERHUB_USERNAME}|${DOCKERHUB_USERNAME}|g; s|\${CI_COMMIT_SHORT_SHA}|${CI_COMMIT_SHORT_SHA}|g"
@@ -85,9 +82,6 @@ deploy:
     - docker
     - self-hosted
   image: bitnami/kubectl:latest
-  before_script:
-    - mkdir -p ~/.kube
-    - echo "${KUBECONFIG_CONTENT}" | base64 -d > ~/.kube/config
   script:
     # Apply base resources
     - kubectl apply -f k8s/namespace.yaml
