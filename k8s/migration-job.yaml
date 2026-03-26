@@ -11,6 +11,8 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      imagePullSecrets:
+        - name: dockerhub-pull
       containers:
         - name: migrate
           image: coddyshelby/g2studio:amyrose-migrator-latest
