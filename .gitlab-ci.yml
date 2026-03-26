@@ -4,8 +4,8 @@ stages:
   - deploy
 
 variables:
-  FRONTEND_IMAGE: ${CI_REGISTRY_IMAGE}/frontend
-  BACKEND_IMAGE: ${CI_REGISTRY_IMAGE}/backend
+  FRONTEND_IMAGE: ${DOCKERHUB_USERNAME}/amyrose-frontend
+  BACKEND_IMAGE: ${DOCKERHUB_USERNAME}/amyrose-backend
 
 # ─── Build Frontend Image ────────────────────────────────────────────────────
 build:frontend:
@@ -19,7 +19,7 @@ build:frontend:
   variables:
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_TOKEN}
   script:
     - docker build
         -t ${FRONTEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
@@ -44,7 +44,7 @@ build:backend:
   variables:
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_TOKEN}
   script:
     - docker build
         -t ${BACKEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
@@ -69,7 +69,7 @@ migrate:
     - echo "${KUBECONFIG_CONTENT}" | base64 -d > ~/.kube/config
   script:
     - export JOB_NAME="prisma-migrate-${CI_COMMIT_SHORT_SHA}"
-    - sed "s|\${CI_REGISTRY_IMAGE}|${CI_REGISTRY_IMAGE}|g; s|\${CI_COMMIT_SHORT_SHA}|${CI_COMMIT_SHORT_SHA}|g"
+    - sed "s|\${DOCKERHUB_USERNAME}|${DOCKERHUB_USERNAME}|g; s|\${CI_COMMIT_SHORT_SHA}|${CI_COMMIT_SHORT_SHA}|g"
         k8s/migration-job.yaml | kubectl apply -f -
     - kubectl -n amyrose wait --for=condition=complete --timeout=120s job/${JOB_NAME}
   only:
@@ -93,13 +93,13 @@ deploy:
     - kubectl apply -f k8s/namespace.yaml
 
     # Deploy backend
-    - sed "s|\${CI_REGISTRY_IMAGE}|${CI_REGISTRY_IMAGE}|g"
+    - sed "s|\${DOCKERHUB_USERNAME}|${DOCKERHUB_USERNAME}|g"
         k8s/backend.yaml | kubectl apply -f -
     - kubectl -n amyrose set image deployment/backend
         backend=${BACKEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
 
     # Deploy frontend
-    - sed "s|\${CI_REGISTRY_IMAGE}|${CI_REGISTRY_IMAGE}|g"
+    - sed "s|\${DOCKERHUB_USERNAME}|${DOCKERHUB_USERNAME}|g"
         k8s/frontend.yaml | kubectl apply -f -
     - kubectl -n amyrose set image deployment/frontend
         frontend=${FRONTEND_IMAGE}:${CI_COMMIT_SHORT_SHA}

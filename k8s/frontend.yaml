@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ${CI_REGISTRY_IMAGE}/frontend:latest
+          image: ${DOCKERHUB_USERNAME}/amyrose-frontend:latest
           ports:
             - containerPort: 3000
           env:

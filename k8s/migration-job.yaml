@@ -13,7 +13,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: migrate
-          image: ${CI_REGISTRY_IMAGE}/frontend:latest
+          image: ${DOCKERHUB_USERNAME}/amyrose-frontend:latest
           command: ["npx", "prisma", "migrate", "deploy"]
           env:
             - name: DATABASE_URL
