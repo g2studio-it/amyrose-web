@@ -23,7 +23,17 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN corepack enable && npm run build
 
-# ─── Stage 3: Runner ────────────────────────────────────────────────────────
+# ─── Stage 3: Migrator (used by migration job) ──────────────────────────────
+FROM node:20-alpine AS migrator
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY prisma ./prisma/
+COPY package.json ./
+
+CMD ["npx", "prisma", "migrate", "deploy"]
+
+# ─── Stage 4: Runner ────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
 

@@ -13,7 +13,7 @@ env:
   NAMESPACE: amyrose
 
 jobs:
-  # ─── Build & Push Frontend ──────────────────────────────────────────────────
+  # ─── Build & Push Frontend + Migrator ──────────────────────────────────────
   build-frontend:
     name: "Build & Push Frontend"
     runs-on: arc-runner-dind
@@ -24,19 +24,31 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build image
+      - name: Build frontend image
         run: |
           docker build \
+            --target runner \
             --cache-from ${{ env.IMAGE }}:amyrose-frontend-latest \
             -t ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }} \
             -t ${{ env.IMAGE }}:amyrose-frontend-latest \
             -f frontend/Dockerfile \
             frontend/
 
-      - name: Push image
+      - name: Build migrator image
+        run: |
+          docker build \
+            --target migrator \
+            -t ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }} \
+            -t ${{ env.IMAGE }}:amyrose-migrator-latest \
+            -f frontend/Dockerfile \
+            frontend/
+
+      - name: Push images
         run: |
           docker push ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}
           docker push ${{ env.IMAGE }}:amyrose-frontend-latest
+          docker push ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }}
+          docker push ${{ env.IMAGE }}:amyrose-migrator-latest
 
   # ─── Build & Push Backend ───────────────────────────────────────────────────
   build-backend:
@@ -82,7 +94,7 @@ jobs:
         run: |
           SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)
           export JOB_NAME="prisma-migrate-${SHORT_SHA}"
-          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}|" k8s/migration-job.yaml
+          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }}|" k8s/migration-job.yaml
           sed -i "s|\${CI_COMMIT_SHORT_SHA}|${SHORT_SHA}|g" k8s/migration-job.yaml
           kubectl apply -f k8s/migration-job.yaml
           kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=120s job/${JOB_NAME}
