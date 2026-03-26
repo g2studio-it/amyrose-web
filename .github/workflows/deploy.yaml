@@ -108,9 +108,28 @@ jobs:
           sed -i "s|:latest|:frontend-${{ github.sha }}|g" k8s/frontend.yaml
           sed -i "s|:latest|:backend-${{ github.sha }}|g" k8s/backend.yaml
 
+      - name: Inject secrets into k8s manifests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          AUTH_URL: ${{ secrets.AUTH_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          MERCADOPAGO_ACCESS_TOKEN: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
+          MERCADOPAGO_WEBHOOK_SECRET: ${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}
+          NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}
+        run: |
+          envsubst < k8s/secrets.yaml > k8s/secrets-rendered.yaml
+
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/secrets-rendered.yaml
           kubectl apply -f k8s/postgres.yaml
           kubectl apply -f k8s/backend.yaml
           kubectl apply -f k8s/frontend.yaml
