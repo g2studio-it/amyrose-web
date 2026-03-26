@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/amyrose
+  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/g2studio
   NAMESPACE: amyrose
 
 jobs:
@@ -27,16 +27,16 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            --cache-from ${{ env.IMAGE }}:frontend-latest \
-            -t ${{ env.IMAGE }}:frontend-${{ github.sha }} \
-            -t ${{ env.IMAGE }}:frontend-latest \
+            --cache-from ${{ env.IMAGE }}:amyrose-frontend-latest \
+            -t ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }} \
+            -t ${{ env.IMAGE }}:amyrose-frontend-latest \
             -f frontend/Dockerfile \
             frontend/
 
       - name: Push image
         run: |
-          docker push ${{ env.IMAGE }}:frontend-${{ github.sha }}
-          docker push ${{ env.IMAGE }}:frontend-latest
+          docker push ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}
+          docker push ${{ env.IMAGE }}:amyrose-frontend-latest
 
   # ─── Build & Push Backend ───────────────────────────────────────────────────
   build-backend:
@@ -52,16 +52,16 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            --cache-from ${{ env.IMAGE }}:backend-latest \
-            -t ${{ env.IMAGE }}:backend-${{ github.sha }} \
-            -t ${{ env.IMAGE }}:backend-latest \
+            --cache-from ${{ env.IMAGE }}:amyrose-backend-latest \
+            -t ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }} \
+            -t ${{ env.IMAGE }}:amyrose-backend-latest \
             -f backend/Dockerfile \
             backend/
 
       - name: Push image
         run: |
-          docker push ${{ env.IMAGE }}:backend-${{ github.sha }}
-          docker push ${{ env.IMAGE }}:backend-latest
+          docker push ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }}
+          docker push ${{ env.IMAGE }}:amyrose-backend-latest
 
   # ─── Run Prisma Migrations ─────────────────────────────────────────────────
   migrate:
@@ -80,9 +80,10 @@ jobs:
 
       - name: Run migration job
         run: |
-          export JOB_NAME="prisma-migrate-$(echo ${{ github.sha }} | cut -c1-8)"
-          sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" k8s/migration-job.yaml
-          sed -i "s|\${CI_COMMIT_SHORT_SHA}|$(echo ${{ github.sha }} | cut -c1-8)|g" k8s/migration-job.yaml
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)
+          export JOB_NAME="prisma-migrate-${SHORT_SHA}"
+          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}|" k8s/migration-job.yaml
+          sed -i "s|\${CI_COMMIT_SHORT_SHA}|${SHORT_SHA}|g" k8s/migration-job.yaml
           kubectl apply -f k8s/migration-job.yaml
           kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=120s job/${JOB_NAME}
 
@@ -103,10 +104,8 @@ jobs:
 
       - name: Set image in manifests
         run: |
-          sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" k8s/backend.yaml
-          sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" k8s/frontend.yaml
-          sed -i "s|:latest|:frontend-${{ github.sha }}|g" k8s/frontend.yaml
-          sed -i "s|:latest|:backend-${{ github.sha }}|g" k8s/backend.yaml
+          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}|" k8s/frontend.yaml
+          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }}|" k8s/backend.yaml
 
       - name: Inject secrets into k8s manifests
         env:
