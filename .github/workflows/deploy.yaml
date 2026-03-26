@@ -128,22 +128,21 @@ jobs:
           sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }}|" k8s/backend.yaml
 
       - name: Inject secrets into k8s manifests
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          AUTH_URL: ${{ secrets.AUTH_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-          MERCADOPAGO_ACCESS_TOKEN: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
-          MERCADOPAGO_WEBHOOK_SECRET: ${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}
-          NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}
         run: |
-          envsubst < k8s/secrets.yaml > k8s/secrets-rendered.yaml
+          cp k8s/secrets.yaml k8s/secrets-rendered.yaml
+          sed -i "s|\${DATABASE_URL}|${{ secrets.DATABASE_URL }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_HOST}|${{ secrets.DB_HOST }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_PORT}|${{ secrets.DB_PORT }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_USERNAME}|${{ secrets.DB_USERNAME }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${DB_NAME}|${{ secrets.DB_NAME }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${AUTH_SECRET}|${{ secrets.AUTH_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${AUTH_URL}|${{ secrets.AUTH_URL }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${JWT_SECRET}|${{ secrets.JWT_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${JWT_REFRESH_SECRET}|${{ secrets.JWT_REFRESH_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${MERCADOPAGO_ACCESS_TOKEN}|${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${MERCADOPAGO_WEBHOOK_SECRET}|${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}|${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}|g" k8s/secrets-rendered.yaml
 
       - name: Create Docker Hub pull secret
         run: |
