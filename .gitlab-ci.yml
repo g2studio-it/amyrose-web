@@ -1,0 +1,122 @@
+stages:
+  - build
+  - migrate
+  - deploy
+
+variables:
+  FRONTEND_IMAGE: ${CI_REGISTRY_IMAGE}/frontend
+  BACKEND_IMAGE: ${CI_REGISTRY_IMAGE}/backend
+
+# ─── Build Frontend Image ────────────────────────────────────────────────────
+build:frontend:
+  stage: build
+  tags:
+    - docker
+    - self-hosted
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - docker build
+        -t ${FRONTEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
+        -t ${FRONTEND_IMAGE}:latest
+        -f frontend/Dockerfile
+        frontend/
+    - docker push ${FRONTEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${FRONTEND_IMAGE}:latest
+  only:
+    - main
+    - master
+
+# ─── Build Backend Image ─────────────────────────────────────────────────────
+build:backend:
+  stage: build
+  tags:
+    - docker
+    - self-hosted
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - docker build
+        -t ${BACKEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
+        -t ${BACKEND_IMAGE}:latest
+        -f backend/Dockerfile
+        backend/
+    - docker push ${BACKEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${BACKEND_IMAGE}:latest
+  only:
+    - main
+    - master
+
+# ─── Run Prisma Migrations ───────────────────────────────────────────────────
+migrate:
+  stage: migrate
+  tags:
+    - docker
+    - self-hosted
+  image: bitnami/kubectl:latest
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "${KUBECONFIG_CONTENT}" | base64 -d > ~/.kube/config
+  script:
+    - export JOB_NAME="prisma-migrate-${CI_COMMIT_SHORT_SHA}"
+    - sed "s|\${CI_REGISTRY_IMAGE}|${CI_REGISTRY_IMAGE}|g; s|\${CI_COMMIT_SHORT_SHA}|${CI_COMMIT_SHORT_SHA}|g"
+        k8s/migration-job.yaml | kubectl apply -f -
+    - kubectl -n amyrose wait --for=condition=complete --timeout=120s job/${JOB_NAME}
+  only:
+    - main
+    - master
+  needs:
+    - build:frontend
+
+# ─── Deploy to VPS (Kubernetes) ──────────────────────────────────────────────
+deploy:
+  stage: deploy
+  tags:
+    - docker
+    - self-hosted
+  image: bitnami/kubectl:latest
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "${KUBECONFIG_CONTENT}" | base64 -d > ~/.kube/config
+  script:
+    # Apply base resources
+    - kubectl apply -f k8s/namespace.yaml
+
+    # Deploy backend
+    - sed "s|\${CI_REGISTRY_IMAGE}|${CI_REGISTRY_IMAGE}|g"
+        k8s/backend.yaml | kubectl apply -f -
+    - kubectl -n amyrose set image deployment/backend
+        backend=${BACKEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
+
+    # Deploy frontend
+    - sed "s|\${CI_REGISTRY_IMAGE}|${CI_REGISTRY_IMAGE}|g"
+        k8s/frontend.yaml | kubectl apply -f -
+    - kubectl -n amyrose set image deployment/frontend
+        frontend=${FRONTEND_IMAGE}:${CI_COMMIT_SHORT_SHA}
+
+    # Apply ingress
+    - kubectl apply -f k8s/ingress.yaml
+
+    # Wait for rollouts
+    - kubectl -n amyrose rollout status deployment/backend --timeout=120s
+    - kubectl -n amyrose rollout status deployment/frontend --timeout=120s
+  only:
+    - main
+    - master
+  needs:
+    - build:frontend
+    - build:backend
+    - migrate
+  environment:
+    name: production
+    url: https://amyrose.example.com

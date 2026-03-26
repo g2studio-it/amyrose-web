@@ -1,0 +1,14 @@
+node_modules
+.next
+dist
+coverage
+.env
+.env.*
+!.env.example
+*.log
+.git
+.gitignore
+README.md
+CLAUDE.md
+k8s
+.gitlab-ci.yml
