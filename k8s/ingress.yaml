@@ -9,10 +9,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - amyrose.example.com
+        - amyrose.g2studio.it.c
       secretName: amyrose-tls
   rules:
-    - host: amyrose.example.com
+    - host: amyrose.g2studio.it.c
       http:
         paths:
           - path: /api
