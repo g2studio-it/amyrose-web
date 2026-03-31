@@ -6,10 +6,12 @@ import {
   ShoppingCart,
   LogOut,
   User,
-  Search,
   Menu,
   X,
   ChevronDown,
+  LayoutDashboard,
+  Settings,
+  ClipboardList,
 } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -23,32 +25,33 @@ const PRODUCT_CATEGORIES = [
   { label: 'Postres',  slug: 'postres' },
 ] as const;
 
-/** Pill/border-button shared style used in header */
-const navBtnClass =
-  'font-serif text-sm border border-nav-burgundy text-nav-purple px-3.5 py-1.5 rounded transition-all duration-150 hover:bg-nav-burgundy hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nav-burgundy focus-visible:ring-offset-2';
-
 export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const { totalItems } = useCart();
   const { data: session, status } = useSession();
 
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileOpen, setMobileOpen]           = useState(false);
+  const [productsOpen, setProductsOpen]       = useState(false);
+  const [userMenuOpen, setUserMenuOpen]       = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const productsRef  = useRef<HTMLDivElement>(null);
+  const userMenuRef  = useRef<HTMLDivElement>(null);
+  const productsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
+    function handler(e: MouseEvent) {
+      if (productsRef.current && !productsRef.current.contains(e.target as Node)) {
+        setProductsOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
       }
     }
-    document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   // Lock body scroll when mobile menu is open
@@ -57,17 +60,17 @@ export function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
-  const openDropdown = useCallback(() => {
-    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
-    setDropdownOpen(true);
+  const openProducts  = useCallback(() => {
+    if (productsTimer.current) clearTimeout(productsTimer.current);
+    setProductsOpen(true);
   }, []);
-
-  const closeDropdown = useCallback(() => {
-    dropdownTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 120);
+  const closeProducts = useCallback(() => {
+    productsTimer.current = setTimeout(() => setProductsOpen(false), 120);
   }, []);
 
   const handleLogout = async () => {
     setMobileOpen(false);
+    setUserMenuOpen(false);
     await signOut({ callbackUrl: `/${locale}` });
   };
 
@@ -79,6 +82,14 @@ export function Header() {
         ? 'text-nav-burgundy after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-nav-burgundy after:rounded-full'
         : 'text-nav-purple hover:text-nav-burgundy'
     }`;
+
+  const iconBtnClass =
+    'p-2 text-nav-purple hover:text-nav-burgundy transition-colors rounded-full hover:bg-nav-lilac-bg';
+
+  const menuItemClass =
+    'flex w-full items-center gap-2.5 px-4 py-2.5 font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg transition-colors duration-100';
+
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   return (
     <>
@@ -99,39 +110,38 @@ export function Header() {
 
             {/* Productos with dropdown */}
             <div
-              ref={dropdownRef}
+              ref={productsRef}
               className="relative"
-              onMouseEnter={openDropdown}
-              onMouseLeave={closeDropdown}
+              onMouseEnter={openProducts}
+              onMouseLeave={closeProducts}
             >
               <button
-                onClick={() => setDropdownOpen((v) => !v)}
+                onClick={() => setProductsOpen((v) => !v)}
                 aria-haspopup="true"
-                aria-expanded={dropdownOpen}
+                aria-expanded={productsOpen}
                 className={`flex items-center gap-1 ${navLinkClass('/catalog')} focus-visible:outline-none`}
               >
                 Productos
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`}
                 />
               </button>
 
-              {/* Dropdown panel */}
               <div
                 className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-52 bg-white border-l-[3px] border-nav-burgundy rounded-r-xl shadow-xl overflow-hidden transition-all duration-200 ${
-                  dropdownOpen
+                  productsOpen
                     ? 'opacity-100 translate-y-0 pointer-events-auto'
                     : 'opacity-0 -translate-y-2 pointer-events-none'
                 }`}
-                onMouseEnter={openDropdown}
-                onMouseLeave={closeDropdown}
+                onMouseEnter={openProducts}
+                onMouseLeave={closeProducts}
                 role="menu"
               >
                 <Link
                   href={`/${locale}/catalog`}
                   role="menuitem"
                   className="block px-5 py-3 font-serif text-sm font-semibold text-nav-purple hover:bg-nav-lilac-bg transition-colors duration-100"
-                  onClick={() => setDropdownOpen(false)}
+                  onClick={() => setProductsOpen(false)}
                 >
                   Ver todos
                 </Link>
@@ -142,7 +152,7 @@ export function Header() {
                       href={`/${locale}/catalog?categorySlug=${item.slug}`}
                       role="menuitem"
                       className="block px-5 py-3 font-serif text-sm text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-100"
-                      onClick={() => setDropdownOpen(false)}
+                      onClick={() => setProductsOpen(false)}
                     >
                       {item.label}
                     </Link>
@@ -160,21 +170,13 @@ export function Header() {
           </nav>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-1.5 ml-auto">
-
-            {/* Search */}
-            <button
-              aria-label="Buscar"
-              className="p-2 text-nav-purple hover:text-nav-burgundy transition-colors rounded-full hover:bg-nav-lilac-bg"
-            >
-              <Search className="h-4.5 w-4.5" />
-            </button>
+          <div className="flex items-center gap-1 ml-auto">
 
             {/* Cart */}
             <Link
               href={`/${locale}/cart`}
               aria-label="Carrito"
-              className="relative p-2 text-nav-purple hover:text-nav-burgundy transition-colors rounded-full hover:bg-nav-lilac-bg"
+              className={`relative ${iconBtnClass}`}
             >
               <ShoppingCart className="h-4.5 w-4.5" />
               {totalItems > 0 && (
@@ -184,28 +186,92 @@ export function Header() {
               )}
             </Link>
 
-            {/* Auth — desktop only */}
+            {/* User icon — desktop only */}
             {status !== 'loading' && (
-              <div className="hidden md:flex items-center gap-1.5">
+              <div className="hidden md:block relative" ref={userMenuRef}>
                 {session?.user ? (
                   <>
-                    <Link href={`/${locale}/orders`} className={navBtnClass}>
-                      <span className="flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5" />
-                        {session.user.name?.split(' ')[0] ?? 'Cuenta'}
-                      </span>
-                    </Link>
                     <button
-                      onClick={handleLogout}
-                      aria-label="Cerrar sesión"
-                      className="p-2 text-nav-purple hover:text-nav-burgundy transition-colors rounded-full hover:bg-nav-lilac-bg"
+                      onClick={() => setUserMenuOpen((v) => !v)}
+                      aria-label="Mi cuenta"
+                      aria-haspopup="true"
+                      aria-expanded={userMenuOpen}
+                      className={`${iconBtnClass} ${userMenuOpen ? 'text-nav-burgundy bg-nav-lilac-bg' : ''}`}
                     >
-                      <LogOut className="h-4 w-4" />
+                      <User className="h-4.5 w-4.5" />
                     </button>
+
+                    {/* User dropdown */}
+                    <div
+                      className={`absolute right-0 top-full mt-2 w-52 bg-white border border-nav-lilac-divider rounded-xl shadow-xl overflow-hidden transition-all duration-150 ${
+                        userMenuOpen
+                          ? 'opacity-100 translate-y-0 pointer-events-auto'
+                          : 'opacity-0 -translate-y-1 pointer-events-none'
+                      }`}
+                      role="menu"
+                    >
+                      {/* User info header */}
+                      <div className="px-4 py-3 border-b border-nav-lilac-divider/60 bg-nav-lilac-bg/40">
+                        <p className="font-serif text-sm font-semibold text-nav-burgundy truncate">
+                          {session.user.name ?? 'Mi cuenta'}
+                        </p>
+                        <p className="text-xs text-nav-purple/60 truncate">{session.user.email}</p>
+                      </div>
+
+                      <Link
+                        href={`/${locale}/orders`}
+                        role="menuitem"
+                        className={menuItemClass}
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <ClipboardList className="h-4 w-4 text-nav-burgundy/70" />
+                        Ver perfil
+                      </Link>
+
+                      <Link
+                        href={`/${locale}/profile`}
+                        role="menuitem"
+                        className={menuItemClass}
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Settings className="h-4 w-4 text-nav-burgundy/70" />
+                        Editar perfil
+                      </Link>
+
+                      {isAdmin && (
+                        <>
+                          <div className="mx-3 h-px bg-nav-lilac-divider/60" />
+                          <Link
+                            href={`/${locale}/admin/dashboard`}
+                            role="menuitem"
+                            className={menuItemClass}
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <LayoutDashboard className="h-4 w-4 text-nav-burgundy/70" />
+                            Dashboard
+                          </Link>
+                        </>
+                      )}
+
+                      <div className="mx-3 h-px bg-nav-lilac-divider/60" />
+
+                      <button
+                        role="menuitem"
+                        onClick={handleLogout}
+                        className={`${menuItemClass} text-nav-burgundy hover:bg-red-50`}
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Cerrar sesión
+                      </button>
+                    </div>
                   </>
                 ) : (
-                  <Link href={`/${locale}/login`} className={navBtnClass}>
-                    Ingresar
+                  <Link
+                    href={`/${locale}/login`}
+                    aria-label="Iniciar sesión"
+                    className={iconBtnClass}
+                  >
+                    <User className="h-4.5 w-4.5" />
                   </Link>
                 )}
               </div>
@@ -213,7 +279,7 @@ export function Header() {
 
             {/* Hamburger — mobile only */}
             <button
-              className="md:hidden p-2 text-nav-purple hover:text-nav-burgundy transition-colors rounded-full hover:bg-nav-lilac-bg"
+              className={`md:hidden ${iconBtnClass}`}
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
               aria-expanded={mobileOpen}
@@ -225,7 +291,6 @@ export function Header() {
       </header>
 
       {/* ── Mobile drawer ─────────────────────────────────────── */}
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px] md:hidden transition-opacity duration-300 ${
           mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -234,7 +299,6 @@ export function Header() {
         aria-hidden="true"
       />
 
-      {/* Slide-in panel */}
       <aside
         className={`fixed top-0 right-0 z-50 h-full w-70 bg-white shadow-2xl md:hidden flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
@@ -243,9 +307,7 @@ export function Header() {
       >
         {/* Panel header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-nav-lilac-divider">
-          <span className="font-serif font-bold text-nav-burgundy text-lg">
-            Amy Rose Bakery
-          </span>
+          <span className="font-serif font-bold text-nav-burgundy text-lg">Amy Rose Bakery</span>
           <button
             onClick={() => setMobileOpen(false)}
             className="p-1.5 text-nav-purple hover:text-nav-burgundy transition-colors rounded-full hover:bg-nav-lilac-bg"
@@ -257,7 +319,6 @@ export function Header() {
 
         {/* Panel navigation */}
         <nav className="flex-1 overflow-y-auto">
-          {/* Productos collapsible */}
           <div className="border-b border-nav-lilac-divider/60">
             <button
               className="flex w-full items-center justify-between px-5 py-3.5 font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg transition-colors"
@@ -306,18 +367,43 @@ export function Header() {
         {/* Panel footer — auth */}
         <div className="px-5 py-4 border-t border-nav-lilac-divider">
           {session?.user ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              <div className="mb-2 pb-2 border-b border-nav-lilac-divider/60">
+                <p className="font-serif text-sm font-semibold text-nav-burgundy truncate">
+                  {session.user.name ?? 'Mi cuenta'}
+                </p>
+                <p className="text-xs text-nav-purple/60 truncate">{session.user.email}</p>
+              </div>
               <Link
                 href={`/${locale}/orders`}
-                className="flex items-center gap-2 font-serif text-sm text-nav-purple"
+                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
-                <User className="h-4 w-4 text-nav-burgundy" />
-                {session.user.name ?? session.user.email}
+                <ClipboardList className="h-4 w-4 text-nav-burgundy/70" />
+                Ver perfil
               </Link>
+              <Link
+                href={`/${locale}/profile`}
+                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Settings className="h-4 w-4 text-nav-burgundy/70" />
+                Editar perfil
+              </Link>
+              {isAdmin && (
+                <Link
+                  href={`/${locale}/admin/dashboard`}
+                  className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <LayoutDashboard className="h-4 w-4 text-nav-burgundy/70" />
+                  Dashboard
+                </Link>
+              )}
+              <div className="my-1 h-px bg-nav-lilac-divider/60" />
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 font-serif text-sm text-nav-burgundy hover:text-nav-purple transition-colors"
+                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-burgundy hover:text-nav-purple transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 Cerrar sesión
@@ -326,9 +412,10 @@ export function Header() {
           ) : (
             <Link
               href={`/${locale}/login`}
-              className="block text-center font-serif text-sm border-2 border-nav-burgundy text-nav-purple px-4 py-2.5 rounded hover:bg-nav-burgundy hover:text-white transition-all"
+              className="flex items-center justify-center gap-2 font-serif text-sm border-2 border-nav-burgundy text-nav-purple px-4 py-2.5 rounded hover:bg-nav-burgundy hover:text-white transition-all"
               onClick={() => setMobileOpen(false)}
             >
+              <User className="h-4 w-4" />
               Ingresar
             </Link>
           )}

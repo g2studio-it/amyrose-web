@@ -129,3 +129,14 @@ export interface BackendAuthResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface ApiUser {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  isActive: boolean;
+  phone: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

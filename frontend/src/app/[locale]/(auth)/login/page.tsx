@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,21 +10,23 @@ interface Props {
 
 export default async function LoginPage({ params }: Props) {
   const { locale } = await params;
-  const t = useTranslations('auth.login');
+  const t = await getTranslations('auth.login');
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-lilac-light/30 to-brand-violet/10 px-4">
+    <div className="from-brand-lilac-light/30 to-brand-violet/10 flex min-h-screen items-center justify-center bg-linear-to-br px-4">
       <div className="w-full max-w-md">
         <Link
           href={`/${locale}`}
-          className="mb-4 inline-flex items-center gap-2 text-sm text-brand-burgundy hover:underline"
+          className="text-brand-burgundy mb-4 inline-flex items-center gap-2 text-sm hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver al inicio
         </Link>
         <Card>
           <CardHeader>
-            <CardTitle className="text-center text-brand-burgundy">{t('title')}</CardTitle>
+            <CardTitle className="text-brand-burgundy text-center">
+              {t('title')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <LoginForm />
