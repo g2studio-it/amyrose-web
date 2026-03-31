@@ -4,7 +4,6 @@ import {
   IsString,
   MinLength,
   MaxLength,
-  Matches,
   IsOptional,
 } from 'class-validator';
 
@@ -13,17 +12,10 @@ export class RegisterDto {
   @IsEmail({}, { message: 'El email no es válido' })
   email!: string;
 
-  @ApiProperty({
-    example: 'SecurePass1',
-    minLength: 8,
-    description: 'Mínimo 8 caracteres, al menos una mayúscula y un número',
-  })
+  @ApiProperty({ example: 'mipass123', minLength: 6 })
   @IsString()
-  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
+  @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
   @MaxLength(128)
-  @Matches(/^(?=.*[A-Z])(?=.*\d)/, {
-    message: 'La contraseña debe contener al menos una mayúscula y un número',
-  })
   password!: string;
 
   @ApiProperty({ example: 'María García', required: false })
@@ -31,4 +23,10 @@ export class RegisterDto {
   @IsString()
   @MaxLength(100)
   name?: string;
+
+  @ApiProperty({ example: '+54 11 1234-5678', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  phone?: string;
 }
