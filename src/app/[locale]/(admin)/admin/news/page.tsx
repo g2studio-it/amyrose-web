@@ -1,16 +1,17 @@
-import { getLocale } from 'next-intl/server';
-import Link from 'next/link';
-import { Plus, FileText, Eye, EyeOff, Pencil } from 'lucide-react';
-import { prisma } from '@/lib/prisma';
-import { formatDate } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { DeletePostButton } from '@/components/admin/DeletePostButton';
-import { TogglePublishButton } from '@/components/admin/TogglePublishButton';
+export const dynamic = "force-dynamic";
+import { getLocale } from "next-intl/server";
+import Link from "next/link";
+import { Plus, FileText, Eye, EyeOff, Pencil } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { formatDate } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { DeletePostButton } from "@/components/admin/DeletePostButton";
+import { TogglePublishButton } from "@/components/admin/TogglePublishButton";
 
 async function getPosts() {
   return prisma.post.findMany({
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     include: { author: { select: { name: true } } },
   });
 }
@@ -27,7 +28,9 @@ export default async function AdminNewsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-[#3B1F5E]">Noticias</h1>
+          <h1 className="font-serif text-2xl font-bold text-[#3B1F5E]">
+            Noticias
+          </h1>
           <p className="mt-1 text-sm text-[#A98EC5]">
             {published} publicadas · {drafts} borradores
           </p>
@@ -93,7 +96,7 @@ export default async function AdminNewsPage() {
                     </p>
                   )}
                   <p className="mt-0.5 text-[10px] text-[#A98EC5]/60">
-                    Por {post.author.name ?? '—'}
+                    Por {post.author.name ?? "—"}
                   </p>
                 </div>
 
@@ -103,14 +106,20 @@ export default async function AdminNewsPage() {
                     variant="outline"
                     className={
                       post.isPublished
-                        ? 'border-green-200 bg-green-50 text-green-700 text-[10px]'
-                        : 'border-yellow-200 bg-yellow-50 text-yellow-700 text-[10px]'
+                        ? "border-green-200 bg-green-50 text-green-700 text-[10px]"
+                        : "border-yellow-200 bg-yellow-50 text-yellow-700 text-[10px]"
                     }
                   >
                     {post.isPublished ? (
-                      <><Eye className="mr-1 h-2.5 w-2.5" />Publicada</>
+                      <>
+                        <Eye className="mr-1 h-2.5 w-2.5" />
+                        Publicada
+                      </>
                     ) : (
-                      <><EyeOff className="mr-1 h-2.5 w-2.5" />Borrador</>
+                      <>
+                        <EyeOff className="mr-1 h-2.5 w-2.5" />
+                        Borrador
+                      </>
                     )}
                   </Badge>
                 </div>

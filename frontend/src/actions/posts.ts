@@ -1,5 +1,5 @@
 'use server';
-
+export const dynamic = 'force-dynamic';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
@@ -14,7 +14,11 @@ const postSchema = z.object({
     .regex(/^[a-z0-9-]+$/, 'Solo minúsculas, números y guiones'),
   excerpt: z.string().max(400).optional(),
   content: z.string().min(1, 'El contenido es requerido'),
-  imageUrl: z.string().url('URL de imagen inválida').optional().or(z.literal('')),
+  imageUrl: z
+    .string()
+    .url('URL de imagen inválida')
+    .optional()
+    .or(z.literal('')),
   isPublished: z.boolean().default(false),
 });
 

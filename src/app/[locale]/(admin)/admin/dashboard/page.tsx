@@ -1,5 +1,6 @@
-import { getLocale } from 'next-intl/server';
-import Link from 'next/link';
+export const dynamic = "force-dynamic";
+import { getLocale } from "next-intl/server";
+import Link from "next/link";
 import {
   Package,
   ShoppingBag,
@@ -8,26 +9,26 @@ import {
   TrendingUp,
   ChevronRight,
   Clock,
-} from 'lucide-react';
-import { prisma } from '@/lib/prisma';
-import { formatPrice, formatDate } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { formatPrice, formatDate } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 async function getStats() {
   const [orders, products, customers, posts, revenueResult, recentOrders] =
     await Promise.all([
       prisma.order.count(),
       prisma.product.count({ where: { isActive: true } }),
-      prisma.user.count({ where: { role: 'CUSTOMER' } }),
+      prisma.user.count({ where: { role: "CUSTOMER" } }),
       prisma.post.count({ where: { isPublished: true } }),
       prisma.order.aggregate({
         _sum: { total: true },
-        where: { paymentStatus: 'APPROVED' },
+        where: { paymentStatus: "APPROVED" },
       }),
       prisma.order.findMany({
         take: 5,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         include: { user: { select: { name: true, email: true } } },
       }),
     ]);
@@ -43,21 +44,21 @@ async function getStats() {
 }
 
 const ORDER_STATUS_STYLES: Record<string, string> = {
-  PENDING: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  CONFIRMED: 'bg-blue-50 text-blue-700 border-blue-200',
-  PROCESSING: 'bg-purple-50 text-purple-700 border-purple-200',
-  READY: 'bg-green-50 text-green-700 border-green-200',
-  DELIVERED: 'bg-gray-50 text-gray-600 border-gray-200',
-  CANCELLED: 'bg-red-50 text-red-600 border-red-200',
+  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  CONFIRMED: "bg-blue-50 text-blue-700 border-blue-200",
+  PROCESSING: "bg-purple-50 text-purple-700 border-purple-200",
+  READY: "bg-green-50 text-green-700 border-green-200",
+  DELIVERED: "bg-gray-50 text-gray-600 border-gray-200",
+  CANCELLED: "bg-red-50 text-red-600 border-red-200",
 };
 
 const ORDER_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Pendiente',
-  CONFIRMED: 'Confirmado',
-  PROCESSING: 'En preparación',
-  READY: 'Listo',
-  DELIVERED: 'Entregado',
-  CANCELLED: 'Cancelado',
+  PENDING: "Pendiente",
+  CONFIRMED: "Confirmado",
+  PROCESSING: "En preparación",
+  READY: "Listo",
+  DELIVERED: "Entregado",
+  CANCELLED: "Cancelado",
 };
 
 export default async function AdminDashboardPage() {
@@ -67,60 +68,60 @@ export default async function AdminDashboardPage() {
 
   const statCards = [
     {
-      label: 'Ingresos aprobados',
+      label: "Ingresos aprobados",
       value: formatPrice(revenue),
       icon: TrendingUp,
-      color: 'text-[#3B1F5E]',
-      bg: 'bg-[#F9F5FB]',
+      color: "text-[#3B1F5E]",
+      bg: "bg-[#F9F5FB]",
       href: null,
     },
     {
-      label: 'Pedidos totales',
+      label: "Pedidos totales",
       value: orders,
       icon: ShoppingBag,
-      color: 'text-[#6B1A2B]',
-      bg: 'bg-red-50',
+      color: "text-[#6B1A2B]",
+      bg: "bg-red-50",
       href: `/${locale}/admin/orders`,
     },
     {
-      label: 'Productos activos',
+      label: "Productos activos",
       value: products,
       icon: Package,
-      color: 'text-[#3B1F5E]',
-      bg: 'bg-[#F9F5FB]',
+      color: "text-[#3B1F5E]",
+      bg: "bg-[#F9F5FB]",
       href: `/${locale}/admin/products`,
     },
     {
-      label: 'Clientes registrados',
+      label: "Clientes registrados",
       value: customers,
       icon: Users,
-      color: 'text-[#6B1A2B]',
-      bg: 'bg-red-50',
+      color: "text-[#6B1A2B]",
+      bg: "bg-red-50",
       href: `/${locale}/admin/customers`,
     },
   ];
 
   const quickActions = [
     {
-      label: 'Nueva noticia',
-      desc: 'Publicar un comunicado',
+      label: "Nueva noticia",
+      desc: "Publicar un comunicado",
       href: `/${locale}/admin/news/new`,
       icon: Newspaper,
     },
     {
-      label: 'Ver pedidos',
+      label: "Ver pedidos",
       desc: `${orders} pedidos en total`,
       href: `/${locale}/admin/orders`,
       icon: ShoppingBag,
     },
     {
-      label: 'Gestionar productos',
+      label: "Gestionar productos",
       desc: `${products} productos activos`,
       href: `/${locale}/admin/products`,
       icon: Package,
     },
     {
-      label: 'Ver clientes',
+      label: "Ver clientes",
       desc: `${customers} clientes`,
       href: `/${locale}/admin/customers`,
       icon: Users,
@@ -148,7 +149,9 @@ export default async function AdminDashboardPage() {
                 <CardTitle className="text-[11px] font-medium uppercase tracking-widest text-[#A98EC5]">
                   {label}
                 </CardTitle>
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${bg}`}>
+                <div
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg ${bg}`}
+                >
                   <Icon className={`h-4 w-4 ${color}`} />
                 </div>
               </CardHeader>
@@ -230,7 +233,7 @@ export default async function AdminDashboardPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-[#3B1F5E]">
-                          {order.user?.name ?? order.user?.email ?? 'Cliente'}
+                          {order.user?.name ?? order.user?.email ?? "Cliente"}
                         </p>
                         <p className="text-xs text-[#A98EC5]">
                           {formatDate(order.createdAt)}
@@ -242,7 +245,7 @@ export default async function AdminDashboardPage() {
                         </span>
                         <Badge
                           variant="outline"
-                          className={`text-[10px] px-2 py-0.5 ${ORDER_STATUS_STYLES[order.status] ?? ''}`}
+                          className={`text-[10px] px-2 py-0.5 ${ORDER_STATUS_STYLES[order.status] ?? ""}`}
                         >
                           {ORDER_STATUS_LABELS[order.status] ?? order.status}
                         </Badge>
