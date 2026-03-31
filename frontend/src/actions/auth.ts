@@ -1,10 +1,10 @@
 'use server';
 
 import { signIn, signOut } from '@/auth';
-import { prisma } from '@/lib/prisma';
 import { loginSchema, registerSchema, type LoginInput, type RegisterInput } from '@/schemas/auth.schema';
-import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
+
+const BACKEND_BASE = (process.env.BACKEND_API_URL ?? 'http://localhost:3001/api/v1').replace(/\/$/, '');
 
 export async function loginAction(data: LoginInput) {
   const parsed = loginSchema.safeParse(data);
@@ -40,21 +40,17 @@ export async function registerAction(data: RegisterInput) {
 
   const { name, email, password, phone } = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return { error: 'Ya existe una cuenta con ese email' };
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 12);
-
-  await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      phone: phone || null,
-    },
+  const res = await fetch(`${BACKEND_BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, name, phone }),
   });
+
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}));
+    const msg = json?.message ?? 'Error al crear la cuenta';
+    return { error: Array.isArray(msg) ? msg[0] : msg };
+  }
 
   try {
     await signIn('credentials', {

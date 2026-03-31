@@ -1,24 +1,25 @@
 import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
-import bcrypt from 'bcryptjs';
 import { loginSchema } from '@/schemas/auth.schema';
 import type { BackendAuthResponse } from '@/lib/api';
 
-async function getBackendTokens(
+const BACKEND_BASE = (process.env.BACKEND_API_URL ?? 'http://localhost:3001/api/v1').replace(/\/$/, '');
+
+async function backendLogin(
   email: string,
   password: string,
-): Promise<{ accessToken: string; refreshToken: string } | null> {
-  const base = (process.env.BACKEND_API_URL ?? 'http://localhost:3001/api/v1').replace(/\/$/, '');
+): Promise<BackendAuthResponse | null> {
   try {
-    const res = await fetch(`${base}/auth/login`, {
+    const res = await fetch(`${BACKEND_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
     if (!res.ok) return null;
-    const data: BackendAuthResponse = await res.json();
-    return { accessToken: data.accessToken, refreshToken: data.refreshToken };
+    const json = await res.json();
+    // Unwrap NestJS TransformInterceptor envelope: { success, data, timestamp }
+    return (json?.data ?? json) as BackendAuthResponse;
   } catch {
     return null;
   }
@@ -35,34 +36,17 @@ export default {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        // Dynamic import to avoid edge runtime issues
-        const { prisma } = await import('@/lib/prisma');
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email },
-        });
-
-        if (!user || !user.password) return null;
-
-        const passwordMatch = await bcrypt.compare(
-          parsed.data.password,
-          user.password
-        );
-        if (!passwordMatch) return null;
-
-        // Get backend JWT tokens alongside NextAuth session
-        const backendTokens = await getBackendTokens(
-          parsed.data.email,
-          parsed.data.password,
-        );
+        const data = await backendLogin(parsed.data.email, parsed.data.password);
+        if (!data) return null;
 
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          role: user.role,
-          backendAccessToken: backendTokens?.accessToken,
-          backendRefreshToken: backendTokens?.refreshToken,
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.name ?? null,
+          image: null,
+          role: data.user.role,
+          backendAccessToken: data.accessToken,
+          backendRefreshToken: data.refreshToken,
         };
       },
     }),
