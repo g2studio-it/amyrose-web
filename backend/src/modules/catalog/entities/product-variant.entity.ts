@@ -1,17 +1,19 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   ManyToOne,
   JoinColumn,
   Index,
+  BeforeInsert,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Product } from './product.entity';
 import { DecimalColumnTransformer } from '../../../common/transformers/decimal.transformer';
 
 @Entity('product_variants')
 export class ProductVariant {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Column()
@@ -44,4 +46,9 @@ export class ProductVariant {
   @ManyToOne(() => Product, (product) => product.variants, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'productId' })
   product!: Product;
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 }

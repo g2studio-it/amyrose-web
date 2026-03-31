@@ -1,16 +1,18 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Order } from './order.entity';
 import { DecimalColumnTransformer } from '../../../common/transformers/decimal.transformer';
 
 @Entity('order_items')
 export class OrderItem {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Column()
@@ -52,4 +54,9 @@ export class OrderItem {
   @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
   order!: Order;
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 }

@@ -56,8 +56,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
         database: cs.get<string>('database.name'),
         autoLoadEntities: true,
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        // synchronize only in development — use migrations in production
-        synchronize: cs.get<string>('app.nodeEnv') === 'development',
+        // Schema is managed by Prisma — TypeORM must not alter tables
+        synchronize: false,
         logging: cs.get<string>('app.nodeEnv') === 'development',
       }),
       inject: [ConfigService],

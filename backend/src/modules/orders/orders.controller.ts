@@ -9,7 +9,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
@@ -45,7 +44,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Obtener detalle de un pedido' })
   findOne(
     @CurrentUser() me: JwtPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.ordersService.findById(id, me.sub, me.role);
   }
@@ -56,7 +55,7 @@ export class OrdersController {
   @ApiParam({ name: 'id', description: 'UUID del pedido' })
   @ApiOperation({ summary: 'Actualizar estado del pedido — solo ADMIN' })
   updateStatus(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
     return this.ordersService.updateStatus(id, dto);
@@ -67,7 +66,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Cancelar un pedido' })
   cancel(
     @CurrentUser() me: JwtPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.ordersService.cancelOrder(id, me.sub, me.role);
   }

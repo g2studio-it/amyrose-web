@@ -10,7 +10,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -96,7 +95,7 @@ export class CatalogController {
   @ApiParam({ name: 'id', description: 'UUID del producto' })
   @ApiOperation({ summary: 'Actualizar producto — solo ADMIN' })
   updateProduct(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateProductDto,
   ) {
     return this.catalogService.updateProduct(id, dto);
@@ -109,7 +108,7 @@ export class CatalogController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: 'id', description: 'UUID del producto' })
   @ApiOperation({ summary: 'Desactivar producto — solo ADMIN' })
-  deleteProduct(@Param('id', ParseUUIDPipe) id: string) {
+  deleteProduct(@Param('id') id: string) {
     return this.catalogService.deleteProduct(id);
   }
 }

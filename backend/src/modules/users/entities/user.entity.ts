@@ -1,7 +1,7 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
@@ -10,15 +10,16 @@ import {
   Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { v4 as uuidv4 } from 'uuid';
 
 export enum UserRole {
-  CUSTOMER = 'customer',
-  ADMIN = 'admin',
+  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'ADMIN',
 }
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Index()
@@ -48,6 +49,14 @@ export class User {
   @Column({ nullable: true })
   phone?: string;
 
+  /** Present in DB (managed by NextAuth/Prisma) — not used by backend */
+  @Column({ nullable: true, name: 'emailVerified' })
+  emailVerified?: Date;
+
+  /** Present in DB (managed by NextAuth/Prisma) — not used by backend */
+  @Column({ nullable: true })
+  image?: string;
+
   /** Stored as bcrypt hash — never exposed in responses */
   @Exclude()
   @Column({ nullable: true, select: false })
@@ -61,6 +70,11 @@ export class User {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 
   @BeforeInsert()
   @BeforeUpdate()

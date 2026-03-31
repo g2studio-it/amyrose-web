@@ -7,7 +7,6 @@ import {
   Body,
   Query,
   UseGuards,
-  ParseUUIDPipe,
   HttpCode,
   HttpStatus,
   ForbiddenException,
@@ -49,7 +48,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   findOne(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() me: JwtPayload,
   ) {
     if (me.role !== UserRole.ADMIN && me.sub !== id) {
@@ -63,7 +62,7 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'UUID del usuario' })
   @ApiResponse({ status: 200, type: UserResponseDto })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateUserDto,
     @CurrentUser() me: JwtPayload,
   ) {
@@ -76,7 +75,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Eliminar usuario (soft delete) — solo ADMIN' })
   @ApiParam({ name: 'id', description: 'UUID del usuario' })
   @ApiResponse({ status: 204, description: 'Usuario eliminado' })
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id') id: string) {
     return this.usersService.softDelete(id);
   }
 }

@@ -1,16 +1,18 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   CreateDateColumn,
   OneToMany,
   Index,
+  BeforeInsert,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Product } from './product.entity';
 
 @Entity('categories')
 export class Category {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Column({ length: 100 })
@@ -37,4 +39,9 @@ export class Category {
 
   @OneToMany(() => Product, (product) => product.category)
   products!: Product[];
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 }

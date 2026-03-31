@@ -1,17 +1,19 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   ManyToOne,
   JoinColumn,
   Unique,
+  BeforeInsert,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Cart } from './cart.entity';
 
 @Entity('cart_items')
 @Unique(['cartId', 'variantId'])
 export class CartItem {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Column()
@@ -29,4 +31,9 @@ export class CartItem {
   @ManyToOne(() => Cart, (cart) => cart.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cartId' })
   cart!: Cart;
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 }

@@ -1,15 +1,17 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Product } from './product.entity';
 
 @Entity('product_images')
 export class ProductImage {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Column()
@@ -30,4 +32,9 @@ export class ProductImage {
   @ManyToOne(() => Product, (product) => product.images, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'productId' })
   product!: Product;
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 }

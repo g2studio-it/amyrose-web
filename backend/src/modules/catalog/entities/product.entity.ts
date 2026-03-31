@@ -1,21 +1,23 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
   Index,
+  BeforeInsert,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Category } from './category.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductVariant } from './product-variant.entity';
 
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   id!: string;
 
   @Column()
@@ -55,4 +57,9 @@ export class Product {
 
   @OneToMany(() => ProductVariant, (variant) => variant.product, { cascade: true })
   variants!: ProductVariant[];
+
+  @BeforeInsert()
+  generateId(): void {
+    if (!this.id) this.id = uuidv4();
+  }
 }
