@@ -137,6 +137,37 @@
       "email": "Email",
       "orders": "Pedidos",
       "joined": "Registrado"
+    },
+    "news": {
+      "title": "Noticias",
+      "subtitle": "Publicaciones del blog",
+      "new": "Nueva noticia",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "publish": "Publicar",
+      "unpublish": "Despublicar",
+      "draft": "Borrador",
+      "published": "Publicada",
+      "author": "Autor",
+      "date": "Fecha",
+      "status": "Estado",
+      "empty": "No hay noticias aún",
+      "emptyDescription": "Creá tu primera noticia para comenzar.",
+      "createFirst": "Crear primera noticia",
+      "form": {
+        "title": "Título",
+        "slug": "Slug",
+        "excerpt": "Resumen",
+        "content": "Contenido",
+        "image": "Imagen destacada",
+        "publishNow": "Publicar ahora",
+        "saveDraft": "Guardar como borrador"
+      }
+    },
+    "categories": {
+      "title": "Categorías",
+      "subtitle": "Organización del catálogo",
+      "new": "Nueva categoría"
     }
   },
   "common": {

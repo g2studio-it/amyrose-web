@@ -137,6 +137,37 @@
       "email": "Email",
       "orders": "Orders",
       "joined": "Joined"
+    },
+    "news": {
+      "title": "News",
+      "subtitle": "Blog posts",
+      "new": "New post",
+      "edit": "Edit",
+      "delete": "Delete",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "draft": "Draft",
+      "published": "Published",
+      "author": "Author",
+      "date": "Date",
+      "status": "Status",
+      "empty": "No posts yet",
+      "emptyDescription": "Create your first post to get started.",
+      "createFirst": "Create first post",
+      "form": {
+        "title": "Title",
+        "slug": "Slug",
+        "excerpt": "Excerpt",
+        "content": "Content",
+        "image": "Featured image",
+        "publishNow": "Publish now",
+        "saveDraft": "Save as draft"
+      }
+    },
+    "categories": {
+      "title": "Categories",
+      "subtitle": "Catalog organization",
+      "new": "New category"
     }
   },
   "common": {

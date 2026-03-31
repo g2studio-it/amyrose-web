@@ -48,6 +48,7 @@ model User {
   addresses Address[]
   orders    Order[]
   cart      Cart?
+  posts     Post[]
 
   @@map("users")
 }
@@ -250,4 +251,24 @@ model OrderItem {
   variant ProductVariant @relation(fields: [variantId], references: [id])
 
   @@map("order_items")
+}
+
+// ─── Blog / News ──────────────────────────────────────────────────────────────
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?   @db.Text
+  content     String    @db.Text
+  imageUrl    String?
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  authorId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@map("posts")
 }
