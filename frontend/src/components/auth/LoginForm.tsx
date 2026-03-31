@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
 
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema';
-import { loginAction } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,11 +33,17 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
-    const result = await loginAction(data);
+
+    const result = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+
     setIsLoading(false);
 
-    if (result?.error) {
-      toast.error(result.error);
+    if (!result?.ok) {
+      toast.error('Email o contraseña incorrectos');
       return;
     }
 

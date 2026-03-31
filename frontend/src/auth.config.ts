@@ -52,8 +52,8 @@ export default {
     }),
   ],
   pages: {
-    signIn: '/es/login',
-    error: '/es/login',
+    signIn: '/login',
+    error: '/login',
   },
   callbacks: {
     jwt({ token, user }) {
