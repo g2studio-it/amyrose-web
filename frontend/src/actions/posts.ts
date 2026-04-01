@@ -37,7 +37,7 @@ export async function createPostAction(data: PostFormData) {
 
   const parsed = postSchema.safeParse(data);
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? 'Datos inválidos' };
+    return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' };
   }
 
   const existing = await prisma.post.findUnique({
@@ -70,7 +70,7 @@ export async function updatePostAction(id: string, data: PostFormData) {
 
   const parsed = postSchema.safeParse(data);
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? 'Datos inválidos' };
+    return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' };
   }
 
   const slugConflict = await prisma.post.findFirst({
