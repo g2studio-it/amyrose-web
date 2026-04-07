@@ -1,3 +1,5 @@
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default async function AdminLayout({
@@ -8,8 +10,11 @@ export default async function AdminLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const session = await auth();
 
-  // TODO: Re-enable auth guards once styling is complete
+  if (!session?.user || session.user.role !== 'ADMIN') {
+    redirect(`/${locale}/login`);
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">
