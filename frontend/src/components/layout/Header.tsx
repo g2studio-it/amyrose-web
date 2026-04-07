@@ -10,7 +10,6 @@ import {
   X,
   ChevronDown,
   LayoutDashboard,
-  Settings,
   ClipboardList,
 } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
@@ -219,23 +218,23 @@ export function Header() {
                       </div>
 
                       <Link
+                        href={`/${locale}/profile`}
+                        role="menuitem"
+                        className={menuItemClass}
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4 text-nav-burgundy/70" />
+                        Mi perfil
+                      </Link>
+
+                      <Link
                         href={`/${locale}/orders`}
                         role="menuitem"
                         className={menuItemClass}
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <ClipboardList className="h-4 w-4 text-nav-burgundy/70" />
-                        Ver perfil
-                      </Link>
-
-                      <Link
-                        href={`/${locale}/profile`}
-                        role="menuitem"
-                        className={menuItemClass}
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <Settings className="h-4 w-4 text-nav-burgundy/70" />
-                        Editar perfil
+                        Mis pedidos
                       </Link>
 
                       {isAdmin && (
@@ -375,20 +374,20 @@ export function Header() {
                 <p className="text-xs text-nav-purple/60 truncate">{session.user.email}</p>
               </div>
               <Link
+                href={`/${locale}/profile`}
+                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <User className="h-4 w-4 text-nav-burgundy/70" />
+                Mi perfil
+              </Link>
+              <Link
                 href={`/${locale}/orders`}
                 className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 <ClipboardList className="h-4 w-4 text-nav-burgundy/70" />
-                Ver perfil
-              </Link>
-              <Link
-                href={`/${locale}/profile`}
-                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <Settings className="h-4 w-4 text-nav-burgundy/70" />
-                Editar perfil
+                Mis pedidos
               </Link>
               {isAdmin && (
                 <Link

@@ -69,6 +69,11 @@ export interface ApiCategory {
   id: string;
   name: string;
   slug: string;
+  description: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
 }
 
 export interface ApiProduct {
