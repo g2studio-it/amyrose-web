@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { PaginationQueryDto } from '../../users/dto/pagination-query.dto';
 
 export class ProductFiltersDto extends PaginationQueryDto {
-  @ApiProperty({ required: false, description: 'Filtrar por UUID de categoría' })
+  @ApiProperty({ required: false, description: 'Filtrar por ID de categoría' })
   @IsOptional()
-  @IsUUID()
+  @IsString()
   categoryId?: string;
 
   @ApiProperty({ required: false, description: 'Filtrar por slug de categoría' })
