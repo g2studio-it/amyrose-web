@@ -144,6 +144,11 @@ jobs:
           sed -i "s|\${MERCADOPAGO_WEBHOOK_SECRET}|${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}|g" k8s/secrets-rendered.yaml
           sed -i "s|\${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}|${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}|g" k8s/secrets-rendered.yaml
 
+      - name: Render ClusterIssuer manifest
+        run: |
+          cp k8s/clusterissuer.yaml k8s/clusterissuer-rendered.yaml
+          sed -i "s|\${LETSENCRYPT_EMAIL}|${{ secrets.LETSENCRYPT_EMAIL }}|g" k8s/clusterissuer-rendered.yaml
+
       - name: Create Docker Hub pull secret
         run: |
           kubectl -n ${{ env.NAMESPACE }} create secret docker-registry dockerhub-pull \
@@ -155,6 +160,7 @@ jobs:
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/clusterissuer-rendered.yaml
           kubectl apply -f k8s/secrets-rendered.yaml
           kubectl apply -f k8s/postgres.yaml
           kubectl apply -f k8s/backend.yaml
