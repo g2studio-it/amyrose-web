@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { ShoppingCart, Plus, Minus, Ruler, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { useCart } from '@/hooks/useCart';
 
 export interface ProductVariant {
@@ -30,6 +33,9 @@ export function ProductDetail({
   );
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const { data: session } = useSession();
+  const router = useRouter();
+  const locale = useLocale();
 
   const selectedVariant = variants.find((v) => v.id === selectedVariantId);
   const isOutOfStock = !selectedVariant || selectedVariant.stock === 0;
@@ -42,6 +48,10 @@ export function ProductDetail({
 
   const handleAddToCart = () => {
     if (!selectedVariant || isOutOfStock) return;
+    if (!session?.user) {
+      router.push(`/${locale}/login`);
+      return;
+    }
     addItem({
       id: `${productId}-${selectedVariant.id}`,
       productId,
