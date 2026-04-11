@@ -1,5 +1,4 @@
 'use server';
-export const dynamic = 'force-dynamic';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';

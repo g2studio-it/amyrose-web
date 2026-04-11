@@ -10,6 +10,7 @@ import {
   type PaginatedResult,
 } from '@/lib/api';
 import { revalidatePath } from 'next/cache';
+import { prisma } from '@/lib/prisma';
 
 async function getAdminToken(): Promise<string> {
   const session = await auth();
@@ -24,24 +25,22 @@ export async function getDashboardStatsAction(): Promise<{
   products: number;
   customers: number;
 }> {
-  const token = await getAdminToken();
-
-  const [ordersResult, productsResult, usersResult] = await Promise.all([
-    api.get<PaginatedResult<ApiOrder>>('/orders?limit=200', token),
-    api.get<PaginatedResult<ApiProduct>>('/catalog/products?limit=1', token),
-    api.get<PaginatedResult<ApiUser>>('/users?limit=1', token),
+  const [orders, products, customers, revenueOrders] = await Promise.all([
+    prisma.order.count(),
+    prisma.product.count(),
+    prisma.user.count({ where: { role: 'CUSTOMER' } }),
+    prisma.order.findMany({
+      where: { paymentStatus: 'APPROVED' },
+      select: { total: true },
+    }),
   ]);
 
-  const revenue = ordersResult.data
-    .filter((o) => o.paymentStatus === 'APPROVED')
-    .reduce((sum, o) => sum + o.total, 0);
+  const revenue = revenueOrders.reduce(
+    (sum, o) => sum + Number(o.total),
+    0,
+  );
 
-  return {
-    revenue,
-    orders: ordersResult.total,
-    products: productsResult.total,
-    customers: usersResult.total,
-  };
+  return { revenue, orders, products, customers };
 }
 
 export async function getAdminProductsAction(
@@ -119,12 +118,12 @@ export async function createAdminProductAction(data: {
   description?: string;
   isFeatured?: boolean;
   variants: { name: string; price: number; stock?: number; sku?: string }[];
-}): Promise<{ error?: string }> {
+}): Promise<{ error?: string; productId?: string }> {
   try {
     const token = await getAdminToken();
-    await api.post<ApiProduct>('/catalog/products', data, token);
+    const product = await api.post<ApiProduct>('/catalog/products', data, token);
     revalidatePath('/[locale]/admin/products', 'page');
-    return {};
+    return { productId: product.id };
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al crear producto' };
   }
