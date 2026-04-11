@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { CatalogService } from './catalog.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto, CreateProductVariantDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductFiltersDto } from './dto/product-filters.dto';
 import { Public } from '../../common/decorators/public.decorator';
@@ -94,10 +94,7 @@ export class CatalogController {
   @ApiBearerAuth('access-token')
   @ApiParam({ name: 'id', description: 'UUID del producto' })
   @ApiOperation({ summary: 'Actualizar producto — solo ADMIN' })
-  updateProduct(
-    @Param('id') id: string,
-    @Body() dto: UpdateProductDto,
-  ) {
+  updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.catalogService.updateProduct(id, dto);
   }
 
@@ -110,5 +107,89 @@ export class CatalogController {
   @ApiOperation({ summary: 'Desactivar producto — solo ADMIN' })
   deleteProduct(@Param('id') id: string) {
     return this.catalogService.deleteProduct(id);
+  }
+
+  // ── Product Images (admin only) ───────────────────────────────────────────
+
+  @Post('products/:id/images')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiParam({ name: 'id', description: 'UUID del producto' })
+  @ApiOperation({ summary: 'Agregar imagen al producto — solo ADMIN' })
+  addProductImage(
+    @Param('id') id: string,
+    @Body() body: { url: string; altText?: string; isPrimary?: boolean },
+  ) {
+    return this.catalogService.addProductImage(id, body);
+  }
+
+  @Patch('products/:id/images/:imageId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiParam({ name: 'id', description: 'UUID del producto' })
+  @ApiParam({ name: 'imageId', description: 'UUID de la imagen' })
+  @ApiOperation({ summary: 'Actualizar imagen — solo ADMIN' })
+  updateProductImage(
+    @Param('id') id: string,
+    @Param('imageId') imageId: string,
+    @Body() body: { altText?: string; isPrimary?: boolean },
+  ) {
+    return this.catalogService.updateProductImage(id, imageId, body);
+  }
+
+  @Delete('products/:id/images/:imageId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiParam({ name: 'id', description: 'UUID del producto' })
+  @ApiParam({ name: 'imageId', description: 'UUID de la imagen' })
+  @ApiOperation({ summary: 'Eliminar imagen — solo ADMIN' })
+  deleteProductImage(@Param('id') id: string, @Param('imageId') imageId: string) {
+    return this.catalogService.deleteProductImage(id, imageId);
+  }
+
+  // ── Product Variants (admin only) ─────────────────────────────────────────
+
+  @Post('products/:id/variants')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiParam({ name: 'id', description: 'UUID del producto' })
+  @ApiOperation({ summary: 'Agregar variante al producto — solo ADMIN' })
+  addProductVariant(@Param('id') id: string, @Body() dto: CreateProductVariantDto) {
+    return this.catalogService.addProductVariant(id, dto);
+  }
+
+  @Patch('products/:id/variants/:variantId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiParam({ name: 'id', description: 'UUID del producto' })
+  @ApiParam({ name: 'variantId', description: 'UUID de la variante' })
+  @ApiOperation({ summary: 'Actualizar variante — solo ADMIN' })
+  updateProductVariant(
+    @Param('id') id: string,
+    @Param('variantId') variantId: string,
+    @Body()
+    body: Partial<{ name: string; price: number; stock: number; sku: string; isActive: boolean }>,
+  ) {
+    return this.catalogService.updateProductVariant(id, variantId, body);
+  }
+
+  @Delete('products/:id/variants/:variantId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiParam({ name: 'id', description: 'UUID del producto' })
+  @ApiParam({ name: 'variantId', description: 'UUID de la variante' })
+  @ApiOperation({ summary: 'Eliminar variante — solo ADMIN' })
+  deleteProductVariant(@Param('id') id: string, @Param('variantId') variantId: string) {
+    return this.catalogService.deleteProductVariant(id, variantId);
   }
 }

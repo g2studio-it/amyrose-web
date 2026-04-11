@@ -13,7 +13,8 @@ import { revalidatePath } from 'next/cache';
 
 async function getAdminToken(): Promise<string> {
   const session = await auth();
-  if (!session?.user?.backendAccessToken) throw new Error('No autorizado');
+  if (!session?.user || session.user.role !== 'ADMIN') throw new Error('No autorizado');
+  if (!session.user.backendAccessToken) throw new Error('No autorizado');
   return session.user.backendAccessToken;
 }
 
@@ -136,6 +137,7 @@ export async function updateAdminProductAction(
     slug: string;
     description: string;
     isFeatured: boolean;
+    isActive: boolean;
     categoryId: string;
   }>,
 ): Promise<{ error?: string }> {
@@ -146,5 +148,95 @@ export async function updateAdminProductAction(
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al actualizar producto' };
+  }
+}
+
+// ── Product Images ──────────────────────────────────────────────────────────
+
+export async function addProductImageAction(
+  productId: string,
+  data: { url: string; altText?: string; isPrimary?: boolean },
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.post(`/catalog/products/${productId}/images`, data, token);
+    revalidatePath('/[locale]/admin/products', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al agregar imagen' };
+  }
+}
+
+export async function updateProductImageAction(
+  productId: string,
+  imageId: string,
+  data: { altText?: string; isPrimary?: boolean },
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.patch(`/catalog/products/${productId}/images/${imageId}`, data, token);
+    revalidatePath('/[locale]/admin/products', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al actualizar imagen' };
+  }
+}
+
+export async function deleteProductImageAction(
+  productId: string,
+  imageId: string,
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.delete(`/catalog/products/${productId}/images/${imageId}`, token);
+    revalidatePath('/[locale]/admin/products', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al eliminar imagen' };
+  }
+}
+
+// ── Product Variants ────────────────────────────────────────────────────────
+
+export async function addProductVariantAction(
+  productId: string,
+  data: { name: string; price: number; stock?: number; sku?: string },
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.post(`/catalog/products/${productId}/variants`, data, token);
+    revalidatePath('/[locale]/admin/products', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al agregar variante' };
+  }
+}
+
+export async function updateProductVariantAction(
+  productId: string,
+  variantId: string,
+  data: Partial<{ name: string; price: number; stock: number; sku: string; isActive: boolean }>,
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.patch(`/catalog/products/${productId}/variants/${variantId}`, data, token);
+    revalidatePath('/[locale]/admin/products', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al actualizar variante' };
+  }
+}
+
+export async function deleteProductVariantAction(
+  productId: string,
+  variantId: string,
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.delete(`/catalog/products/${productId}/variants/${variantId}`, token);
+    revalidatePath('/[locale]/admin/products', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al eliminar variante' };
   }
 }

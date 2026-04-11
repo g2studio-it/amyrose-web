@@ -1,5 +1,3 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
 import { ShoppingBag } from 'lucide-react';
 import { getAdminOrdersAction } from '@/actions/admin';
 import { OrderStatusSelect } from '@/components/admin/OrderStatusSelect';
@@ -25,11 +23,6 @@ const PAYMENT_LABELS: Record<string, string> = {
 
 export default async function AdminOrdersPage({ params, searchParams }: Props) {
   const [{ locale }, { page: pageParam }] = await Promise.all([params, searchParams]);
-
-  const session = await auth();
-  if (!session?.user || session.user.role !== 'ADMIN') {
-    redirect(`/${locale}/login`);
-  }
 
   const page = Math.max(1, Number(pageParam ?? 1));
   const result = await getAdminOrdersAction(page, 20).catch(() => ({

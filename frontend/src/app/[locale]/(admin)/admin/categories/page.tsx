@@ -1,20 +1,7 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
 import { Tag } from 'lucide-react';
 import { getAdminCategoriesAction } from '@/actions/admin';
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AdminCategoriesPage({ params }: Props) {
-  const { locale } = await params;
-
-  const session = await auth();
-  if (!session?.user || session.user.role !== 'ADMIN') {
-    redirect(`/${locale}/login`);
-  }
-
+export default async function AdminCategoriesPage() {
   const categories = await getAdminCategoriesAction().catch(() => []);
 
   return (

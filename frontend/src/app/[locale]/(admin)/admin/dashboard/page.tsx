@@ -1,5 +1,3 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
 import { TrendingUp, ShoppingBag, Package, Users } from 'lucide-react';
 import { getDashboardStatsAction, getAdminOrdersAction } from '@/actions/admin';
 
@@ -34,10 +32,6 @@ const PAYMENT_LABELS: Record<string, string> = {
 
 export default async function AdminDashboardPage({ params }: Props) {
   const { locale } = await params;
-  const session = await auth();
-  if (!session?.user || session.user.role !== 'ADMIN') {
-    redirect(`/${locale}/login`);
-  }
 
   const [stats, recentOrders] = await Promise.all([
     getDashboardStatsAction().catch(() => ({ revenue: 0, orders: 0, products: 0, customers: 0 })),
