@@ -6,7 +6,7 @@ metadata:
   labels:
     app: frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -41,9 +41,9 @@ spec:
                   name: amyrose-secrets
                   key: AUTH_URL
             - name: BACKEND_API_URL
-              value: "https://amyrose.example.com/api"
+              value: "http://backend:3001/api/v1"
             - name: NEXT_PUBLIC_APP_URL
-              value: "https://amyrose.example.com"
+              value: "https://amyrose.g2studio.it.com"
             - name: MERCADOPAGO_ACCESS_TOKEN
               valueFrom:
                 secretKeyRef:
