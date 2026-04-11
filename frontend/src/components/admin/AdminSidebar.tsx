@@ -14,6 +14,7 @@ import {
   LogOut,
   ChevronRight,
   Store,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,7 +53,11 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  onClose?: () => void;
+}
+
+export function AdminSidebar({ onClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const locale = useLocale();
   const base = `/${locale}/admin`;
@@ -69,7 +74,7 @@ export function AdminSidebar() {
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#6B1A2B]">
           <Store className="h-4 w-4 text-white" />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate font-serif font-bold text-[#3B1F5E] text-sm leading-tight">
             Amy Rose
           </p>
@@ -77,6 +82,15 @@ export function AdminSidebar() {
             Admin
           </p>
         </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            aria-label="Cerrar menú"
+            className="md:hidden rounded-lg p-1 text-nav-purple/50 hover:bg-[#F9F5FB] hover:text-nav-purple transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
