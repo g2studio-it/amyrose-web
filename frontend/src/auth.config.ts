@@ -6,6 +6,9 @@ import type { BackendAuthResponse } from '@/lib/api';
 
 const BACKEND_BASE = (process.env.BACKEND_API_URL ?? 'http://localhost:3001/api/v1').replace(/\/$/, '');
 
+// Expires 60 s before real expiry so we refresh proactively
+const ACCESS_TOKEN_TTL_MS = 14 * 60 * 1000; // 14 min (backend issues 15 min tokens)
+
 async function backendLogin(
   email: string,
   password: string,
@@ -18,7 +21,20 @@ async function backendLogin(
     });
     if (!res.ok) return null;
     const json = await res.json();
-    // Unwrap NestJS TransformInterceptor envelope: { success, data, timestamp }
+    return (json?.data ?? json) as BackendAuthResponse;
+  } catch {
+    return null;
+  }
+}
+
+async function backendRefresh(refreshToken: string): Promise<BackendAuthResponse | null> {
+  try {
+    const res = await fetch(`${BACKEND_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${refreshToken}` },
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
     return (json?.data ?? json) as BackendAuthResponse;
   } catch {
     return null;
@@ -56,15 +72,45 @@ export default {
     error: '/login',
   },
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
+      // First sign-in: populate all fields from the user returned by authorize()
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.backendAccessToken = user.backendAccessToken;
         token.backendRefreshToken = user.backendRefreshToken;
+        token.backendAccessTokenExpiry = Date.now() + ACCESS_TOKEN_TTL_MS;
+        return token;
       }
-      return token;
+
+      // Subsequent requests: refresh backend token if expired
+      const expiry = token.backendAccessTokenExpiry as number | undefined;
+      if (expiry && Date.now() < expiry) {
+        // Token still valid
+        return token;
+      }
+
+      // Token expired — try to refresh
+      const refreshToken = token.backendRefreshToken as string | undefined;
+      if (!refreshToken) {
+        // No refresh token → clear backend tokens so the user is re-challenged
+        return { ...token, backendAccessToken: undefined, backendRefreshToken: undefined };
+      }
+
+      const refreshed = await backendRefresh(refreshToken);
+      if (!refreshed) {
+        // Refresh failed (token revoked / backend down) → force re-login
+        return { ...token, backendAccessToken: undefined, backendRefreshToken: undefined };
+      }
+
+      return {
+        ...token,
+        backendAccessToken: refreshed.accessToken,
+        backendRefreshToken: refreshed.refreshToken,
+        backendAccessTokenExpiry: Date.now() + ACCESS_TOKEN_TTL_MS,
+      };
     },
+
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
