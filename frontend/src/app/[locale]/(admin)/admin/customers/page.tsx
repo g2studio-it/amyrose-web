@@ -31,14 +31,14 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#3B1F5E]">Clientes</h1>
-        <p className="text-sm text-[#3B1F5E]/50 mt-0.5">{result.total} usuarios registrados</p>
+        <h1 className="text-2xl font-bold text-nav-purple">Clientes</h1>
+        <p className="text-sm text-nav-purple/50 mt-0.5">{result.total} usuarios registrados</p>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#6B1A2B]/10 overflow-hidden">
+      <div className="bg-card rounded-xl border border-nav-lilac-divider/50 overflow-hidden">
         {result.data.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-[#3B1F5E]/40">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-nav-purple/40">
             <Users className="h-10 w-10 opacity-30" />
             <p className="text-sm">No hay usuarios registrados</p>
           </div>
@@ -46,7 +46,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F9F5FB] text-[#3B1F5E]/50 text-xs uppercase tracking-wide">
+                <tr className="bg-section-tinted text-nav-purple/50 text-xs uppercase tracking-wide">
                   <th className="px-6 py-3 text-left font-medium">Usuario</th>
                   <th className="px-6 py-3 text-left font-medium">Teléfono</th>
                   <th className="px-6 py-3 text-left font-medium">Rol</th>
@@ -60,7 +60,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
                     .charAt(0)
                     .toUpperCase();
                   return (
-                    <tr key={user.id} className="hover:bg-[#F9F5FB] transition-colors">
+                    <tr key={user.id} className="hover:bg-section-tinted transition-colors">
                       {/* User info */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -68,17 +68,17 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-[#3B1F5E] truncate">
-                              {user.name ?? <span className="text-[#3B1F5E]/40 italic">Sin nombre</span>}
+                            <p className="font-medium text-nav-purple truncate">
+                              {user.name ?? <span className="text-nav-purple/40 italic">Sin nombre</span>}
                             </p>
-                            <p className="text-xs text-[#3B1F5E]/50 truncate">{user.email}</p>
+                            <p className="text-xs text-nav-purple/50 truncate">{user.email}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Phone */}
-                      <td className="px-6 py-4 text-[#3B1F5E]/60 text-xs">
-                        {user.phone ?? <span className="text-[#3B1F5E]/30">—</span>}
+                      <td className="px-6 py-4 text-nav-purple/60 text-xs">
+                        {user.phone ?? <span className="text-nav-purple/30">—</span>}
                       </td>
 
                       {/* Role */}
@@ -100,7 +100,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
                       </td>
 
                       {/* Joined date */}
-                      <td className="px-6 py-4 text-[#3B1F5E]/50 text-xs whitespace-nowrap">
+                      <td className="px-6 py-4 text-nav-purple/50 text-xs whitespace-nowrap">
                         {new Date(user.createdAt).toLocaleDateString('es-AR', {
                           day: '2-digit',
                           month: 'short',
@@ -118,7 +118,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-[#3B1F5E]/50">
+        <div className="flex items-center justify-between text-sm text-nav-purple/50">
           <span>
             Mostrando {(page - 1) * result.limit + 1}–
             {Math.min(page * result.limit, result.total)} de {result.total}
@@ -127,7 +127,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
             {page > 1 && (
               <a
                 href={`/${locale}/admin/customers?page=${page - 1}`}
-                className="px-3 py-1.5 rounded-lg border border-[#6B1A2B]/15 hover:bg-[#F9F5FB] text-[#3B1F5E] transition-colors"
+                className="px-3 py-1.5 rounded-lg border border-nav-lilac-divider/60 hover:bg-section-tinted text-nav-purple transition-colors"
               >
                 ← Anterior
               </a>
@@ -135,7 +135,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
             {page < totalPages && (
               <a
                 href={`/${locale}/admin/customers?page=${page + 1}`}
-                className="px-3 py-1.5 rounded-lg border border-[#6B1A2B]/15 hover:bg-[#F9F5FB] text-[#3B1F5E] transition-colors"
+                className="px-3 py-1.5 rounded-lg border border-nav-lilac-divider/60 hover:bg-section-tinted text-nav-purple transition-colors"
               >
                 Siguiente →
               </a>

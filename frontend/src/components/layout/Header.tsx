@@ -11,7 +11,10 @@ import {
   ChevronDown,
   LayoutDashboard,
   ClipboardList,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
@@ -30,10 +33,16 @@ export function Header() {
   const { totalItems } = useCart();
   const { data: session, status } = useSession();
 
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
   const [mobileOpen, setMobileOpen]           = useState(false);
   const [productsOpen, setProductsOpen]       = useState(false);
   const [userMenuOpen, setUserMenuOpen]       = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+
+  // Avoid SSR mismatch for theme icon
+  useEffect(() => { setMounted(true); }, []);
 
   const productsRef  = useRef<HTMLDivElement>(null);
   const userMenuRef  = useRef<HTMLDivElement>(null);
@@ -93,7 +102,7 @@ export function Header() {
   return (
     <>
       {/* ── Main header bar ───────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-white border-b border-nav-lilac-divider/70 shadow-[0_1px_4px_rgba(59,31,94,0.06)]">
+      <header className="sticky top-0 z-50 bg-background border-b border-nav-lilac-divider/70 shadow-[0_1px_4px_rgba(59,31,94,0.06)]">
         <div className="container mx-auto px-4 flex h-16 items-center gap-6">
 
           {/* Logo */}
@@ -127,7 +136,7 @@ export function Header() {
               </button>
 
               <div
-                className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-52 bg-white border-l-[3px] border-nav-burgundy rounded-r-xl shadow-xl overflow-hidden transition-all duration-200 ${
+                className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-52 bg-background border-l-[3px] border-nav-burgundy rounded-r-xl shadow-xl overflow-hidden transition-all duration-200 ${
                   productsOpen
                     ? 'opacity-100 translate-y-0 pointer-events-auto'
                     : 'opacity-0 -translate-y-2 pointer-events-none'
@@ -171,6 +180,20 @@ export function Header() {
           {/* Right side actions */}
           <div className="flex items-center gap-1 ml-auto">
 
+            {/* Theme toggle */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                aria-label="Cambiar tema"
+                className={iconBtnClass}
+              >
+                {resolvedTheme === 'dark'
+                  ? <Sun className="h-4.5 w-4.5" />
+                  : <Moon className="h-4.5 w-4.5" />
+                }
+              </button>
+            )}
+
             {/* Cart */}
             <Link
               href={`/${locale}/cart`}
@@ -202,7 +225,7 @@ export function Header() {
 
                     {/* User dropdown */}
                     <div
-                      className={`absolute right-0 top-full mt-2 w-52 bg-white border border-nav-lilac-divider rounded-xl shadow-xl overflow-hidden transition-all duration-150 ${
+                      className={`absolute right-0 top-full mt-2 w-52 bg-background border border-nav-lilac-divider rounded-xl shadow-xl overflow-hidden transition-all duration-150 ${
                         userMenuOpen
                           ? 'opacity-100 translate-y-0 pointer-events-auto'
                           : 'opacity-0 -translate-y-1 pointer-events-none'
@@ -257,7 +280,7 @@ export function Header() {
                       <button
                         role="menuitem"
                         onClick={handleLogout}
-                        className={`${menuItemClass} text-nav-burgundy hover:bg-red-50`}
+                        className={`${menuItemClass} text-nav-burgundy hover:bg-red-50 dark:hover:bg-red-950/40`}
                       >
                         <LogOut className="h-4 w-4" />
                         Cerrar sesión
@@ -299,7 +322,7 @@ export function Header() {
       />
 
       <aside
-        className={`fixed top-0 right-0 z-50 h-full w-70 bg-white shadow-2xl md:hidden flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+        className={`fixed top-0 right-0 z-50 h-full w-70 bg-background shadow-2xl md:hidden flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         aria-label="Menú de navegación"
@@ -402,7 +425,7 @@ export function Header() {
               <div className="my-1 h-px bg-nav-lilac-divider/60" />
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-burgundy hover:text-nav-purple transition-colors"
+                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-burgundy hover:text-nav-purple dark:hover:text-nav-lilac-divider transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 Cerrar sesión

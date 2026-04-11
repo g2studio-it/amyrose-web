@@ -32,15 +32,15 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#3B1F5E]">Productos</h1>
-          <p className="text-sm text-[#3B1F5E]/50 mt-0.5">{result.total} productos en total</p>
+          <h1 className="text-2xl font-bold text-nav-purple">Productos</h1>
+          <p className="text-sm text-nav-purple/50 mt-0.5">{result.total} productos en total</p>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#6B1A2B]/10 overflow-hidden">
+      <div className="bg-card rounded-xl border border-nav-lilac-divider/50 overflow-hidden">
         {result.data.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-[#3B1F5E]/40">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-nav-purple/40">
             <Package className="h-10 w-10 opacity-30" />
             <p className="text-sm">No hay productos registrados</p>
           </div>
@@ -48,7 +48,7 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F9F5FB] text-[#3B1F5E]/50 text-xs uppercase tracking-wide">
+                <tr className="bg-section-tinted text-nav-purple/50 text-xs uppercase tracking-wide">
                   <th className="px-6 py-3 text-left font-medium">Producto</th>
                   <th className="px-6 py-3 text-left font-medium">Categoría</th>
                   <th className="px-6 py-3 text-left font-medium">Variantes</th>
@@ -66,7 +66,7 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
                   const totalStock = activeVariants.reduce((sum, v) => sum + v.stock, 0);
 
                   return (
-                    <tr key={product.id} className="hover:bg-[#F9F5FB] transition-colors">
+                    <tr key={product.id} className="hover:bg-section-tinted transition-colors">
                       {/* Product name + image placeholder */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -74,39 +74,39 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
                             <img
                               src={product.images[0].url}
                               alt={product.name}
-                              className="h-9 w-9 rounded-lg object-cover border border-[#6B1A2B]/10 shrink-0"
+                              className="h-9 w-9 rounded-lg object-cover border border-nav-lilac-divider/50 shrink-0"
                             />
                           ) : (
-                            <div className="h-9 w-9 rounded-lg bg-[#F9F5FB] flex items-center justify-center shrink-0">
-                              <Package className="h-4 w-4 text-[#A98EC5]" />
+                            <div className="h-9 w-9 rounded-lg bg-section-tinted flex items-center justify-center shrink-0">
+                              <Package className="h-4 w-4 text-muted-foreground" />
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="font-medium text-[#3B1F5E] truncate max-w-48">
+                            <p className="font-medium text-nav-purple truncate max-w-48">
                               {product.name}
                             </p>
-                            <p className="text-xs text-[#3B1F5E]/40 truncate">{product.slug}</p>
+                            <p className="text-xs text-nav-purple/40 truncate">{product.slug}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Category */}
-                      <td className="px-6 py-4 text-[#3B1F5E]/70">
+                      <td className="px-6 py-4 text-nav-purple/70">
                         {product.category.name}
                       </td>
 
                       {/* Variants */}
                       <td className="px-6 py-4">
-                        <span className="text-[#3B1F5E]/70">
+                        <span className="text-nav-purple/70">
                           {activeVariants.length}{' '}
-                          <span className="text-[#3B1F5E]/40 text-xs">
+                          <span className="text-nav-purple/40 text-xs">
                             ({totalStock} en stock)
                           </span>
                         </span>
                       </td>
 
                       {/* Price */}
-                      <td className="px-6 py-4 font-semibold text-[#3B1F5E]">
+                      <td className="px-6 py-4 font-semibold text-nav-purple">
                         {minPrice !== null
                           ? `$${Number(minPrice).toLocaleString('es-AR')}`
                           : '—'}
@@ -152,7 +152,7 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-[#3B1F5E]/50">
+        <div className="flex items-center justify-between text-sm text-nav-purple/50">
           <span>
             Mostrando {(page - 1) * result.limit + 1}–
             {Math.min(page * result.limit, result.total)} de {result.total}
@@ -161,7 +161,7 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
             {page > 1 && (
               <a
                 href={`/${locale}/admin/products?page=${page - 1}`}
-                className="px-3 py-1.5 rounded-lg border border-[#6B1A2B]/15 hover:bg-[#F9F5FB] text-[#3B1F5E] transition-colors"
+                className="px-3 py-1.5 rounded-lg border border-nav-lilac-divider/60 hover:bg-section-tinted text-nav-purple transition-colors"
               >
                 ← Anterior
               </a>
@@ -169,7 +169,7 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
             {page < totalPages && (
               <a
                 href={`/${locale}/admin/products?page=${page + 1}`}
-                className="px-3 py-1.5 rounded-lg border border-[#6B1A2B]/15 hover:bg-[#F9F5FB] text-[#3B1F5E] transition-colors"
+                className="px-3 py-1.5 rounded-lg border border-nav-lilac-divider/60 hover:bg-section-tinted text-nav-purple transition-colors"
               >
                 Siguiente →
               </a>

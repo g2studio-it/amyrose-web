@@ -21,14 +21,14 @@ export default async function AdminCategoriesPage({ params }: Props) {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#3B1F5E]">Categorías</h1>
-        <p className="text-sm text-[#3B1F5E]/50 mt-0.5">{categories.length} categorías activas</p>
+        <h1 className="text-2xl font-bold text-nav-purple">Categorías</h1>
+        <p className="text-sm text-nav-purple/50 mt-0.5">{categories.length} categorías activas</p>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#6B1A2B]/10 overflow-hidden">
+      <div className="bg-card rounded-xl border border-nav-lilac-divider/50 overflow-hidden">
         {categories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-[#3B1F5E]/40">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-nav-purple/40">
             <Tag className="h-10 w-10 opacity-30" />
             <p className="text-sm">No hay categorías registradas</p>
           </div>
@@ -36,7 +36,7 @@ export default async function AdminCategoriesPage({ params }: Props) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F9F5FB] text-[#3B1F5E]/50 text-xs uppercase tracking-wide">
+                <tr className="bg-section-tinted text-nav-purple/50 text-xs uppercase tracking-wide">
                   <th className="px-6 py-3 text-left font-medium">Nombre</th>
                   <th className="px-6 py-3 text-left font-medium">Slug</th>
                   <th className="px-6 py-3 text-left font-medium">Descripción</th>
@@ -46,33 +46,33 @@ export default async function AdminCategoriesPage({ params }: Props) {
               </thead>
               <tbody className="divide-y divide-[#6B1A2B]/6">
                 {categories.map((cat) => (
-                  <tr key={cat.id} className="hover:bg-[#F9F5FB] transition-colors">
+                  <tr key={cat.id} className="hover:bg-section-tinted transition-colors">
                     {/* Name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2.5">
                         <div className="h-8 w-8 rounded-lg bg-[#A98EC5]/20 flex items-center justify-center shrink-0">
-                          <Tag className="h-3.5 w-3.5 text-[#6B1A2B]" />
+                          <Tag className="h-3.5 w-3.5 text-nav-burgundy" />
                         </div>
-                        <p className="font-medium text-[#3B1F5E]">{cat.name}</p>
+                        <p className="font-medium text-nav-purple">{cat.name}</p>
                       </div>
                     </td>
 
                     {/* Slug */}
                     <td className="px-6 py-4">
-                      <code className="text-xs bg-[#F9F5FB] text-[#6B1A2B] px-2 py-0.5 rounded font-mono">
+                      <code className="text-xs bg-section-tinted text-nav-burgundy px-2 py-0.5 rounded font-mono">
                         {cat.slug}
                       </code>
                     </td>
 
                     {/* Description */}
-                    <td className="px-6 py-4 text-[#3B1F5E]/60 text-xs max-w-64">
+                    <td className="px-6 py-4 text-nav-purple/60 text-xs max-w-64">
                       <p className="truncate">
-                        {cat.description ?? <span className="text-[#3B1F5E]/30">Sin descripción</span>}
+                        {cat.description ?? <span className="text-nav-purple/30">Sin descripción</span>}
                       </p>
                     </td>
 
                     {/* Sort order */}
-                    <td className="px-6 py-4 text-[#3B1F5E]/50 text-xs">
+                    <td className="px-6 py-4 text-nav-purple/50 text-xs">
                       {cat.sortOrder}
                     </td>
 

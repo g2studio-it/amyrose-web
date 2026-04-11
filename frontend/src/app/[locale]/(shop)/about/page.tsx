@@ -71,7 +71,7 @@ export default async function AboutPage({ params }: Props) {
               />
             </div>
             {/* Floating badge */}
-            <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-xl px-5 py-4 border border-nav-lilac-divider/40">
+            <div className="absolute -bottom-5 -right-5 bg-card rounded-2xl shadow-xl px-5 py-4 border border-nav-lilac-divider/40">
               <p className="font-serif font-bold text-nav-burgundy text-2xl">+8</p>
               <p className="font-serif text-xs text-nav-purple/70 uppercase tracking-wider">años de experiencia</p>
             </div>
@@ -80,7 +80,7 @@ export default async function AboutPage({ params }: Props) {
           {/* Text */}
           <div className="space-y-6">
             <div>
-              <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">
+              <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
                 Mi historia
               </p>
               <h2 className="font-serif font-bold text-3xl text-nav-purple leading-snug">
@@ -117,10 +117,10 @@ export default async function AboutPage({ params }: Props) {
       </section>
 
       {/* ── Highlights ────────────────────────────────────────── */}
-      <section className="bg-[#F9F5FB] py-20 px-4">
+      <section className="bg-section-tinted py-20 px-4">
         <div className="container mx-auto max-w-5xl">
           <div className="text-center mb-12">
-            <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">
+            <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
               Por qué elegirme
             </p>
             <h2 className="font-serif font-bold text-3xl text-nav-purple">
@@ -132,7 +132,7 @@ export default async function AboutPage({ params }: Props) {
             {HIGHLIGHTS.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
-                className="bg-white rounded-2xl p-6 border border-nav-burgundy/10 hover:border-nav-burgundy/30 hover:shadow-lg transition-all duration-300 text-center"
+                className="bg-card rounded-2xl p-6 border border-nav-burgundy/10 hover:border-nav-burgundy/30 hover:shadow-lg transition-all duration-300 text-center"
               >
                 <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-nav-burgundy/10 mb-4">
                   <Icon className="h-6 w-6 text-nav-burgundy" />
@@ -148,7 +148,7 @@ export default async function AboutPage({ params }: Props) {
       {/* ── Process ───────────────────────────────────────────── */}
       <section className="container mx-auto px-4 py-20 max-w-4xl">
         <div className="text-center mb-12">
-          <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">
+          <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
             Cómo trabajo
           </p>
           <h2 className="font-serif font-bold text-3xl text-nav-purple">
@@ -183,7 +183,7 @@ export default async function AboutPage({ params }: Props) {
         </p>
         <Link
           href={`/${locale}/catalog`}
-          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-white text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
+          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-background text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
         >
           Ver el catálogo
         </Link>
