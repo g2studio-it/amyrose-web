@@ -61,5 +61,8 @@ export class Product {
   @BeforeInsert()
   generateId(): void {
     if (!this.id) this.id = uuidv4();
+    const now = new Date();
+    if (!this.createdAt) this.createdAt = now;
+    if (!this.updatedAt) this.updatedAt = now;
   }
 }
