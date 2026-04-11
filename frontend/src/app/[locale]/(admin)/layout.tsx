@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminShell } from '@/components/admin/AdminShell';
 
 export default async function AdminLayout({
   children,
@@ -16,12 +16,5 @@ export default async function AdminLayout({
     redirect(`/${locale}/login`);
   }
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">
-      <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-    </div>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }
