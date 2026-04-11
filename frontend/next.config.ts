@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**.amazonaws.com',
       },
+      // Brave Image Search CDN
+      {
+        protocol: 'https',
+        hostname: 'imgs.search.brave.com',
+      },
     ],
   },
 };
