@@ -1,5 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 import { getOrdersAction } from '@/actions/orders';
 
 interface Props {
@@ -17,7 +19,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default async function OrdersPage({ params }: Props) {
   const { locale } = await params;
-  // TODO: Re-enable auth guard once styling is complete
+  const session = await auth();
+  if (!session?.user) redirect(`/${locale}/login`);
+
   const t = await getTranslations('orders');
   const orders = await getOrdersAction();
 

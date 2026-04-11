@@ -1,8 +1,8 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
 import { Package } from 'lucide-react';
-import { getAdminProductsAction } from '@/actions/admin';
+import { getAdminProductsAction, getAdminCategoriesAction } from '@/actions/admin';
 import { ProductDeleteButton } from '@/components/admin/ProductDeleteButton';
+import { CreateProductDialog } from '@/components/admin/CreateProductDialog';
+import { EditProductDialog } from '@/components/admin/EditProductDialog';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -12,18 +12,11 @@ interface Props {
 export default async function AdminProductsPage({ params, searchParams }: Props) {
   const [{ locale }, { page: pageParam }] = await Promise.all([params, searchParams]);
 
-  const session = await auth();
-  if (!session?.user || session.user.role !== 'ADMIN') {
-    redirect(`/${locale}/login`);
-  }
-
   const page = Math.max(1, Number(pageParam ?? 1));
-  const result = await getAdminProductsAction(page, 20).catch(() => ({
-    data: [],
-    total: 0,
-    page,
-    limit: 20,
-  }));
+  const [result, categories] = await Promise.all([
+    getAdminProductsAction(page, 20).catch(() => ({ data: [], total: 0, page, limit: 20 })),
+    getAdminCategoriesAction().catch(() => []),
+  ]);
 
   const totalPages = Math.ceil(result.total / result.limit);
 
@@ -35,6 +28,7 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
           <h1 className="text-2xl font-bold text-[#3B1F5E]">Productos</h1>
           <p className="text-sm text-[#3B1F5E]/50 mt-0.5">{result.total} productos en total</p>
         </div>
+        <CreateProductDialog categories={categories} />
       </div>
 
       {/* Table */}
@@ -139,7 +133,10 @@ export default async function AdminProductsPage({ params, searchParams }: Props)
 
                       {/* Actions */}
                       <td className="px-6 py-4 text-right">
-                        <ProductDeleteButton productId={product.id} productName={product.name} />
+                        <div className="flex items-center justify-end gap-1">
+                          <EditProductDialog product={product} categories={categories} />
+                          <ProductDeleteButton productId={product.id} productName={product.name} />
+                        </div>
                       </td>
                     </tr>
                   );

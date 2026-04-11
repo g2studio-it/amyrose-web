@@ -1,8 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/LoginForm';
+import { auth } from '@/auth';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -10,6 +12,10 @@ interface Props {
 
 export default async function LoginPage({ params }: Props) {
   const { locale } = await params;
+  const session = await auth();
+  if (session?.user) {
+    redirect(session.user.role === 'ADMIN' ? `/${locale}/admin/dashboard` : `/${locale}`);
+  }
   const t = await getTranslations('auth.login');
 
   return (

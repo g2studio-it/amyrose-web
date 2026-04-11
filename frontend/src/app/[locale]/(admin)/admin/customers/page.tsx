@@ -1,5 +1,3 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
 import { Users } from 'lucide-react';
 import { getAdminUsersAction } from '@/actions/admin';
 import { UserToggleButton } from '@/components/admin/UserToggleButton';
@@ -11,11 +9,6 @@ interface Props {
 
 export default async function AdminCustomersPage({ params, searchParams }: Props) {
   const [{ locale }, { page: pageParam }] = await Promise.all([params, searchParams]);
-
-  const session = await auth();
-  if (!session?.user || session.user.role !== 'ADMIN') {
-    redirect(`/${locale}/login`);
-  }
 
   const page = Math.max(1, Number(pageParam ?? 1));
   const result = await getAdminUsersAction(page, 20).catch(() => ({
