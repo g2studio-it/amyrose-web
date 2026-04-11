@@ -258,6 +258,17 @@ model OrderItem {
 
 // ─── Blog / News ──────────────────────────────────────────────────────────────
 
+model SocialLink {
+  id        String  @id @default(cuid())
+  platform  String
+  label     String
+  url       String
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  @@map("social_links")
+}
+
 model Post {
   id          String    @id @default(cuid())
   title       String
