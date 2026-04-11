@@ -92,7 +92,7 @@ export default async function HomePage({ params }: Props) {
       {/* ── Categories ────────────────────────────────────────────── */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-10">
-          <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">
+          <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
             Lo que hacemos
           </p>
           <h2 className="font-serif font-bold text-3xl text-nav-purple">
@@ -121,7 +121,7 @@ export default async function HomePage({ params }: Props) {
                   {cat.label}
                 </h3>
               </div>
-              <div className="bg-white px-5 py-4">
+              <div className="bg-card px-5 py-4">
                 <p className="text-sm text-nav-purple/70 leading-relaxed">{cat.description}</p>
                 <p className="mt-3 font-serif text-xs font-semibold text-nav-burgundy uppercase tracking-wider">
                   Ver productos →
@@ -134,11 +134,11 @@ export default async function HomePage({ params }: Props) {
 
       {/* ── Featured products ─────────────────────────────────────── */}
       {featuredProducts.length > 0 && (
-        <section className="bg-[#F9F5FB] py-16">
+        <section className="bg-section-tinted py-16">
           <div className="container mx-auto px-4">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-1">
+                <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">
                   Selección especial
                 </p>
                 <h2 className="font-serif font-bold text-3xl text-nav-purple">
@@ -184,7 +184,7 @@ export default async function HomePage({ params }: Props) {
         <section className="container mx-auto px-4 py-16">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-1">
+              <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">
                 Disponible ahora
               </p>
               <h2 className="font-serif font-bold text-3xl text-nav-purple">
@@ -246,7 +246,7 @@ export default async function HomePage({ params }: Props) {
         </p>
         <Link
           href={`/${locale}/catalog`}
-          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-white text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
+          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-background text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
         >
           Ver el catálogo
         </Link>

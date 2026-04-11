@@ -63,17 +63,17 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="flex h-screen w-56 flex-col border-r border-[#6B1A2B]/12 bg-white">
+    <aside className="flex h-screen w-56 flex-col border-r border-nav-lilac-divider/50 bg-card">
       {/* Brand */}
-      <div className="flex h-16 items-center gap-3 border-b border-[#6B1A2B]/10 px-4">
+      <div className="flex h-16 items-center gap-3 border-b border-nav-lilac-divider/50 px-4">
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#6B1A2B]">
           <Store className="h-4 w-4 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="truncate font-serif font-bold text-[#3B1F5E] text-sm leading-tight">
+          <p className="truncate font-serif font-bold text-nav-purple text-sm leading-tight">
             Amy Rose
           </p>
-          <p className="text-[10px] uppercase tracking-widest text-[#A98EC5]">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
             Admin
           </p>
         </div>
@@ -84,7 +84,7 @@ export function AdminSidebar() {
         {NAV_GROUPS.map(({ group, items }) => (
           <div key={group ?? '__root'}>
             {group && (
-              <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#A98EC5]">
+              <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                 {group}
               </p>
             )}
@@ -97,13 +97,13 @@ export function AdminSidebar() {
                       'group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-all duration-150',
                       isActive(href)
                         ? 'bg-[#6B1A2B] text-white font-medium shadow-sm'
-                        : 'text-[#3B1F5E]/65 hover:bg-[#F9F5FB] hover:text-[#3B1F5E]',
+                        : 'text-nav-purple/65 hover:bg-nav-lilac-bg hover:text-nav-purple',
                     )}
                   >
                     <Icon
                       className={cn(
                         'h-4 w-4 flex-shrink-0',
-                        isActive(href) ? 'text-white' : 'text-[#A98EC5] group-hover:text-[#3B1F5E]',
+                        isActive(href) ? 'text-white' : 'text-muted-foreground group-hover:text-nav-purple',
                       )}
                     />
                     <span className="flex-1">{label}</span>
@@ -119,17 +119,17 @@ export function AdminSidebar() {
       </nav>
 
       {/* Footer — back to store + logout */}
-      <div className="border-t border-[#6B1A2B]/10 px-2 py-3 space-y-0.5">
+      <div className="border-t border-nav-lilac-divider/50 px-2 py-3 space-y-0.5">
         <Link
           href={`/${locale}`}
-          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[#3B1F5E]/50 hover:bg-[#F9F5FB] hover:text-[#3B1F5E] transition-colors"
+          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-nav-purple/50 hover:bg-nav-lilac-bg hover:text-nav-purple transition-colors"
         >
           <Store className="h-4 w-4" />
           Ver tienda
         </Link>
         <button
           onClick={() => void signOut({ callbackUrl: `/${locale}` })}
-          className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[#6B1A2B]/60 hover:bg-red-50 hover:text-[#6B1A2B] transition-colors"
+          className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-nav-burgundy/60 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-nav-burgundy transition-colors"
         >
           <LogOut className="h-4 w-4" />
           Cerrar sesión
