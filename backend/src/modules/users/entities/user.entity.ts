@@ -74,6 +74,7 @@ export class User {
   @BeforeInsert()
   generateId(): void {
     if (!this.id) this.id = uuidv4();
+    this.updatedAt = new Date();
   }
 
   @BeforeInsert()
