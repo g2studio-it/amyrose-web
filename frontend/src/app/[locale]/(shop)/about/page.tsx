@@ -80,7 +80,8 @@ export default async function AboutPage({ params }: Props) {
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
-            <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-xl px-5 py-4 border border-nav-lilac-divider/40">
+            {/* Floating badge */}
+            <div className="absolute -bottom-5 -right-5 bg-card rounded-2xl shadow-xl px-5 py-4 border border-nav-lilac-divider/40">
               <p className="font-serif font-bold text-nav-burgundy text-2xl">+8</p>
               <p className="font-serif text-xs text-nav-purple/70 uppercase tracking-wider">años de experiencia</p>
             </div>
@@ -88,7 +89,9 @@ export default async function AboutPage({ params }: Props) {
 
           <div className="space-y-6">
             <div>
-              <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">Mi historia</p>
+              <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                Mi historia
+              </p>
               <h2 className="font-serif font-bold text-3xl text-nav-purple leading-snug">
                 Del amor por la cocina<br />a un sueño hecho realidad
               </h2>
@@ -117,72 +120,26 @@ export default async function AboutPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── Quick stats ───────────────────────────────────────── */}
-      <section className="bg-[#F9F5FB] py-14 px-4">
-        <div className="container mx-auto max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            { icon: Clock, value: '+8', label: 'Años de experiencia' },
-            { icon: Cake, value: '∞', label: 'Recetas propias' },
-            { icon: Cake, value: '100%', label: 'Artesanal' },
-            { icon: Clock, value: '48h', label: 'Anticipación mínima' },
-          ].map(({ icon: Icon, value, label }) => (
-            <div key={label} className="bg-white rounded-2xl p-5 border border-nav-burgundy/10 shadow-sm">
-              <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-nav-burgundy/10 mb-3 mx-auto">
-                <Icon className="h-5 w-5 text-nav-burgundy" />
-              </div>
-              <p className="font-serif font-extrabold text-2xl text-nav-burgundy">{value}</p>
-              <p className="text-xs text-nav-purple/60 mt-1">{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Articles ──────────────────────────────────────────── */}
-      {articles.length > 0 && (
-        <section className="container mx-auto px-4 py-20 max-w-5xl">
+      {/* ── Highlights ────────────────────────────────────────── */}
+      <section className="bg-section-tinted py-20 px-4">
+        <div className="container mx-auto max-w-5xl">
           <div className="text-center mb-12">
-            <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">Del blog</p>
-            <h2 className="font-serif font-bold text-3xl text-nav-purple">Artículos</h2>
+            <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
+              Por qué elegirme
+            </p>
+            <h2 className="font-serif font-bold text-3xl text-nav-purple">
+              Lo que me define
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((article) => (
-              <article
-                key={article.id}
-                className="bg-white rounded-2xl border border-nav-burgundy/10 overflow-hidden hover:border-nav-burgundy/30 hover:shadow-xl transition-all duration-300 flex flex-col"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {HIGHLIGHTS.map(({ icon: Icon, title, description }) => (
+              <div
+                key={title}
+                className="bg-card rounded-2xl p-6 border border-nav-burgundy/10 hover:border-nav-burgundy/30 hover:shadow-lg transition-all duration-300 text-center"
               >
-                {article.imageUrl ? (
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={article.imageUrl}
-                      alt={article.title}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                ) : (
-                  <div className="h-48 bg-gradient-to-br from-nav-purple/10 to-nav-burgundy/10 flex items-center justify-center">
-                    <span className="text-4xl">🍰</span>
-                  </div>
-                )}
-
-                <div className="p-5 flex-1 flex flex-col gap-3">
-                  <h3 className="font-serif font-bold text-lg text-nav-purple leading-snug">
-                    {article.title}
-                  </h3>
-                  {article.excerpt && (
-                    <p className="text-sm text-nav-purple/65 leading-relaxed line-clamp-3 flex-1">
-                      {article.excerpt}
-                    </p>
-                  )}
-                  {article.publishedAt && (
-                    <p className="text-xs text-nav-purple/40">
-                      {new Date(article.publishedAt).toLocaleDateString('es-AR', {
-                        day: '2-digit', month: 'long', year: 'numeric',
-                      })}
-                    </p>
-                  )}
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-nav-burgundy/10 mb-4">
+                  <Icon className="h-6 w-6 text-nav-burgundy" />
                 </div>
               </article>
             ))}
@@ -193,8 +150,12 @@ export default async function AboutPage({ params }: Props) {
       {/* ── Process ───────────────────────────────────────────── */}
       <section className={`px-4 py-20 max-w-4xl mx-auto ${articles.length > 0 ? 'border-t border-nav-burgundy/10' : ''}`}>
         <div className="text-center mb-12">
-          <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">Cómo trabajo</p>
-          <h2 className="font-serif font-bold text-3xl text-nav-purple">El proceso de un pedido</h2>
+          <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
+            Cómo trabajo
+          </p>
+          <h2 className="font-serif font-bold text-3xl text-nav-purple">
+            El proceso de un pedido
+          </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
@@ -255,7 +216,7 @@ export default async function AboutPage({ params }: Props) {
         </p>
         <Link
           href={`/${locale}/catalog`}
-          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-white text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
+          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-background text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
         >
           Ver el catálogo
         </Link>

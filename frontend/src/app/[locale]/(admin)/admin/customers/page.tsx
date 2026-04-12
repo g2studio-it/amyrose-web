@@ -26,11 +26,89 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
         <p className="text-sm text-nav-purple/50 mt-0.5">{result.total} usuarios registrados</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#6B1A2B]/10 overflow-hidden">
-        <CustomersTable users={result.data} />
+      {/* Table */}
+      <div className="bg-card rounded-xl border border-nav-lilac-divider/50 overflow-hidden">
+        {result.data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-nav-purple/40">
+            <Users className="h-10 w-10 opacity-30" />
+            <p className="text-sm">No hay usuarios registrados</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-section-tinted text-nav-purple/50 text-xs uppercase tracking-wide">
+                  <th className="px-6 py-3 text-left font-medium">Usuario</th>
+                  <th className="px-6 py-3 text-left font-medium">Teléfono</th>
+                  <th className="px-6 py-3 text-left font-medium">Rol</th>
+                  <th className="px-6 py-3 text-left font-medium">Estado</th>
+                  <th className="px-6 py-3 text-left font-medium">Registrado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#6B1A2B]/6">
+                {result.data.map((user) => {
+                  const initials = (user.name ?? user.email)
+                    .charAt(0)
+                    .toUpperCase();
+                  return (
+                    <tr key={user.id} className="hover:bg-section-tinted transition-colors">
+                      {/* User info */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#6B1A2B] to-[#3B1F5E] flex items-center justify-center text-white text-xs font-bold shrink-0 select-none">
+                            {initials}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-nav-purple truncate">
+                              {user.name ?? <span className="text-nav-purple/40 italic">Sin nombre</span>}
+                            </p>
+                            <p className="text-xs text-nav-purple/50 truncate">{user.email}</p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Phone */}
+                      <td className="px-6 py-4 text-nav-purple/60 text-xs">
+                        {user.phone ?? <span className="text-nav-purple/30">—</span>}
+                      </td>
+
+                      {/* Role */}
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            user.role === 'ADMIN'
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-blue-50 text-blue-700'
+                          }`}
+                        >
+                          {user.role === 'ADMIN' ? 'Admin' : 'Cliente'}
+                        </span>
+                      </td>
+
+                      {/* Toggle active */}
+                      <td className="px-6 py-4">
+                        <UserToggleButton userId={user.id} isActive={user.isActive} />
+                      </td>
+
+                      {/* Joined date */}
+                      <td className="px-6 py-4 text-nav-purple/50 text-xs whitespace-nowrap">
+                        {new Date(user.createdAt).toLocaleDateString('es-AR', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm text-nav-purple/50">
         <div className="flex items-center justify-between text-sm text-nav-purple/50">
           <span>
             Mostrando {(page - 1) * result.limit + 1}–
