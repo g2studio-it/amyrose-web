@@ -62,6 +62,10 @@
   --nav-lilac-divider: #D8C8E8;
   --section-tinted-bg: #F9F5FB;
 
+  /* Dark mode brand palette (accesibles en ambos modos vía utilidades) */
+  --dm-primary: #4F2361;
+  --dm-secondary: #7F5281;
+
   /* Sidebar */
   --sidebar: oklch(0.38 0.15 290);
   --sidebar-foreground: oklch(0.98 0 0);
@@ -74,48 +78,58 @@
 }
 
 .dark {
-  --background: oklch(0.1 0.02 290);
-  --foreground: oklch(0.95 0.02 295);
+  /* ── Fondos ──────────────────────────────────────────────────── */
+  --background: #2A292E;          /* fondo principal oscuro */
+  --foreground: #FFFFFF;
 
-  --card: oklch(0.15 0.03 290);
-  --card-foreground: oklch(0.95 0.02 295);
+  --card: #332F38;                /* tarjetas — ligeramente más claro que bg */
+  --card-foreground: #FFFFFF;
 
-  --popover: oklch(0.15 0.03 290);
-  --popover-foreground: oklch(0.95 0.02 295);
+  --popover: #332F38;
+  --popover-foreground: #FFFFFF;
 
-  --primary: oklch(0.75 0.1 295);
-  --primary-foreground: oklch(0.15 0.03 290);
+  /* ── Colores interactivos (paleta nueva) ────────────────────── */
+  --primary: #7F5281;             /* secundario como primary — mayor contraste */
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.44 0.1 295);
-  --secondary-foreground: oklch(0.95 0.02 295);
+  --secondary: #4F2361;           /* primary como secondary */
+  --secondary-foreground: #FFFFFF;
 
-  --muted: oklch(0.22 0.04 290);
-  --muted-foreground: oklch(0.65 0.08 295);
+  /* ── Neutros ─────────────────────────────────────────────────── */
+  --muted: #3D3845;
+  --muted-foreground: oklch(0.72 0.05 295);
 
-  --accent: oklch(0.44 0.1 295);
-  --accent-foreground: oklch(0.95 0.02 295);
+  --accent: #7F5281;
+  --accent-foreground: #FFFFFF;
 
-  --destructive: oklch(0.5 0.22 27);
+  --destructive: oklch(0.6 0.22 27);
 
-  --border: oklch(0.25 0.04 290);
-  --input: oklch(0.25 0.04 290);
-  --ring: oklch(0.75 0.1 295);
+  --border: #4D4558;
+  --input: #3D3845;
+  --ring: #7F5281;
 
-  /* Nav / brand tokens (dark) */
-  --nav-purple: #C9A8D9;
-  --nav-burgundy: #E8A0AE;
-  --nav-lilac-bg: #1E1429;
-  --nav-lilac-divider: #2D1F3E;
-  --section-tinted-bg: #120E1C;
+  /* ── Brand / Nav tokens ─────────────────────────────────────── */
+  --nav-purple: #F0E6FA;          /* texto principal — lavanda casi blanco */
+  --nav-burgundy: #C4A0D0;        /* acentos y links */
+  --nav-lilac-bg: #3D3845;        /* hover backgrounds */
+  --nav-lilac-divider: #4D4558;   /* bordes y separadores */
+  --section-tinted-bg: #322E37;   /* fondo de secciones alternadas */
 
-  --sidebar: oklch(0.12 0.03 290);
-  --sidebar-foreground: oklch(0.95 0.02 295);
-  --sidebar-primary: oklch(0.32 0.13 13);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.22 0.04 290);
-  --sidebar-accent-foreground: oklch(0.95 0.02 295);
-  --sidebar-border: oklch(0.25 0.04 290);
-  --sidebar-ring: oklch(0.75 0.1 295);
+  /* ── Brand colors (dark-adjusted) ───────────────────────────── */
+  --brand-burgundy: #7F5281;      /* botones primarios en dark */
+  --brand-violet: #7F5281;
+  --brand-lilac-dark: #C4A0D0;
+  --brand-lilac-light: #F0E6FA;
+
+  /* ── Sidebar ────────────────────────────────────────────────── */
+  --sidebar: #1E1B22;
+  --sidebar-foreground: #F0E6FA;
+  --sidebar-primary: #7F5281;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #4F2361;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #4D4558;
+  --sidebar-ring: #7F5281;
 }
 
 @theme inline {
@@ -169,6 +183,9 @@
   --color-nav-lilac-bg: var(--nav-lilac-bg);
   --color-nav-lilac-divider: var(--nav-lilac-divider);
   --color-section-tinted: var(--section-tinted-bg);
+  /* Dark mode palette utilities */
+  --color-dm-primary: var(--dm-primary);
+  --color-dm-secondary: var(--dm-secondary);
 }
 
 * {
