@@ -31,7 +31,7 @@ export default async function AdminCategoriesPage() {
                   <th className="px-6 py-3 text-left font-medium">Estado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#6B1A2B]/6">
+              <tbody className="divide-y divide-[#6B1A2B]/6 dark:divide-dm-secondary/20">
                 {categories.map((cat) => (
                   <tr key={cat.id} className="hover:bg-section-tinted transition-colors">
                     {/* Name */}
