@@ -64,9 +64,9 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
   };
 
   return (
-    <aside className="border-nav-lilac-divider/50 bg-card flex h-screen w-56 flex-col border-r">
+    <aside className="border-nav-lilac-divider/50 dark:border-dm-secondary/30 bg-card flex h-screen w-56 flex-col border-r">
       {/* Brand */}
-      <div className="border-nav-lilac-divider/50 flex h-16 items-center gap-3 border-b px-4">
+      <div className="border-nav-lilac-divider/50 dark:border-dm-secondary/30 flex h-16 items-center gap-3 border-b px-4">
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#6B1A2B]">
           <Store className="h-4 w-4 text-white" />
         </div>
@@ -82,7 +82,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
           <button
             onClick={onClose}
             aria-label="Cerrar menú"
-            className="text-nav-purple/50 hover:text-nav-purple rounded-lg p-1 transition-colors hover:bg-[#F9F5FB] md:hidden"
+            className="text-nav-purple/50 hover:text-nav-purple rounded-lg p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10 md:hidden"
           >
             <X className="h-4 w-4" />
           </button>
@@ -107,7 +107,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
                       'group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-all duration-150',
                       isActive(href)
                         ? 'bg-[#6B1A2B] font-medium text-white shadow-sm'
-                        : 'text-nav-purple/65 hover:bg-nav-lilac-bg hover:text-nav-purple'
+                        : 'text-nav-purple/65 dark:text-[#F5E6F0]/70 hover:bg-black/5 dark:hover:bg-white/10 hover:text-nav-purple dark:hover:text-[#F5E6F0]'
                     )}
                   >
                     <Icon
@@ -131,10 +131,10 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
       </nav>
 
       {/* Footer — back to store + logout */}
-      <div className="border-nav-lilac-divider/50 space-y-0.5 border-t px-2 py-3">
+      <div className="border-nav-lilac-divider/50 dark:border-dm-secondary/30 space-y-0.5 border-t px-2 py-3">
         <Link
           href={`/${locale}`}
-          className="text-nav-purple/50 hover:bg-nav-lilac-bg hover:text-nav-purple flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors"
+          className="text-nav-purple/50 dark:text-[#F5E6F0]/60 hover:bg-black/5 dark:hover:bg-white/10 hover:text-nav-purple dark:hover:text-[#F5E6F0] flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors"
         >
           <Store className="h-4 w-4" />
           Ver tienda

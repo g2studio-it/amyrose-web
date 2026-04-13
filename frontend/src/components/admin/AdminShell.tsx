@@ -8,7 +8,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">
+    <div className="flex h-screen overflow-hidden bg-background">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -27,17 +27,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto bg-background">
         {/* Mobile top bar */}
-        <div className="flex h-12 items-center border-b border-[#6B1A2B]/10 bg-white px-4 md:hidden">
+        <div className="flex h-12 items-center border-b border-nav-lilac-divider/50 dark:border-dm-secondary/30 bg-background px-4 md:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             aria-label="Abrir menú"
-            className="rounded-lg p-1.5 text-[#3B1F5E]/60 hover:bg-[#F9F5FB] hover:text-[#3B1F5E] transition-colors"
+            className="rounded-lg p-1.5 text-nav-purple/60 hover:bg-black/5 dark:hover:bg-white/10 hover:text-nav-purple transition-colors"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <p className="ml-3 font-serif font-semibold text-[#3B1F5E] text-sm">
+          <p className="ml-3 font-serif font-semibold text-nav-purple dark:text-[#F5E6F0] text-sm">
             Amy Rose Admin
           </p>
         </div>
