@@ -371,5 +371,4 @@ export function NewsAdminClient({ posts, socialLinks }: Props) {
   );
 }
 
-// re-export for about page use
-export { PlatformIcon, PLATFORMS };
+export { PlatformIcon };
