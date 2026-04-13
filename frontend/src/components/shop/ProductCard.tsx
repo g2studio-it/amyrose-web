@@ -32,7 +32,7 @@ export function ProductCard({
       href={`/${locale}/catalog/${slug}`}
       className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6B1A2B] focus-visible:ring-offset-2 rounded-[12px]"
     >
-      <article className="h-full flex flex-col bg-card border border-[#6B1A2B]/50 dark:border-nav-burgundy/30 rounded-[12px] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_28px_rgba(107,26,43,0.14)] hover:border-[#6B1A2B] dark:hover:border-nav-burgundy hover:-translate-y-0.5">
+      <article className="h-full flex flex-col bg-card border border-[#6B1A2B]/50 dark:border-dm-secondary/40 rounded-[12px] overflow-hidden transition-all duration-300 hover:shadow-[0_6px_28px_rgba(107,26,43,0.14)] dark:hover:shadow-[0_6px_28px_rgba(127,82,129,0.25)] hover:border-[#6B1A2B] dark:hover:border-dm-secondary hover:-translate-y-0.5">
 
         {/* ── Image — ~65% of card height ─────────────────────── */}
         <div className="relative overflow-hidden aspect-[4/3] flex-shrink-0 bg-section-tinted">
@@ -52,14 +52,14 @@ export function ProductCard({
 
           {/* Featured ribbon */}
           {isFeatured && (
-            <div className="absolute top-0 left-0 bg-[#6B1A2B] text-white font-serif text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-br-xl">
+            <div className="absolute top-0 left-0 bg-[#6B1A2B] dark:bg-dm-primary text-white font-serif text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-br-xl">
               Destacado
             </div>
           )}
 
           {/* Size count pill */}
           {variantCount > 1 && (
-            <div className="absolute bottom-2.5 right-2.5 bg-background/80 dark:bg-card/80 backdrop-blur-sm border border-[#6B1A2B]/30 dark:border-nav-burgundy/30 text-nav-purple font-serif text-[10px] tracking-wide px-2 py-0.5 rounded-full">
+            <div className="absolute bottom-2.5 right-2.5 bg-background/80 backdrop-blur-sm border border-[#6B1A2B]/30 dark:border-dm-secondary/40 text-nav-purple font-serif text-[10px] tracking-wide px-2 py-0.5 rounded-full">
               {variantCount} tamaños
             </div>
           )}
