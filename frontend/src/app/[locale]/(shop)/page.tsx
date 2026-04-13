@@ -105,7 +105,7 @@ export default async function HomePage({ params }: Props) {
             <Link
               key={cat.slug}
               href={`/${locale}/catalog?categorySlug=${cat.slug}`}
-              className="group relative overflow-hidden rounded-2xl border border-nav-burgundy/20 hover:border-nav-burgundy/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              className="group relative overflow-hidden rounded-2xl border border-nav-burgundy/20 dark:border-dm-secondary/30 hover:border-nav-burgundy/50 dark:hover:border-dm-secondary transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
               <div className="relative h-48 overflow-hidden">
                 <Image
@@ -121,7 +121,7 @@ export default async function HomePage({ params }: Props) {
                   {cat.label}
                 </h3>
               </div>
-              <div className="bg-card px-5 py-4">
+              <div className="bg-card px-5 py-4 border-t border-nav-lilac-divider dark:border-dm-secondary/20">
                 <p className="text-sm text-nav-purple/70 leading-relaxed">{cat.description}</p>
                 <p className="mt-3 font-serif text-xs font-semibold text-nav-burgundy uppercase tracking-wider">
                   Ver productos →
@@ -225,7 +225,7 @@ export default async function HomePage({ params }: Props) {
           <div className="mt-10 text-center sm:hidden">
             <Link
               href={`/${locale}/catalog`}
-              className="inline-flex font-serif font-semibold text-sm border-2 border-nav-burgundy text-nav-burgundy px-6 py-2.5 rounded-full hover:bg-nav-burgundy hover:text-white transition-all"
+              className="inline-flex font-serif font-semibold text-sm border-2 border-nav-burgundy dark:border-dm-secondary text-nav-burgundy dark:text-nav-burgundy px-6 py-2.5 rounded-full hover:bg-nav-burgundy dark:hover:bg-dm-secondary hover:text-white transition-all"
             >
               Ver catálogo completo
             </Link>
@@ -246,7 +246,7 @@ export default async function HomePage({ params }: Props) {
         </p>
         <Link
           href={`/${locale}/catalog`}
-          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-background text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
+          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-white dark:bg-dm-primary text-nav-burgundy dark:text-white hover:bg-nav-lilac-bg dark:hover:bg-dm-secondary transition-colors duration-200"
         >
           Ver el catálogo
         </Link>

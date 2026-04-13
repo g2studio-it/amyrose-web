@@ -52,8 +52,8 @@ export default async function CatalogPage({ params, searchParams }: Props) {
             href={`/${locale}/catalog`}
             className={`font-serif text-sm px-4 py-1.5 rounded-full border transition-all ${
               !categorySlug
-                ? 'bg-nav-burgundy text-white border-nav-burgundy'
-                : 'border-nav-burgundy/40 text-nav-purple hover:border-nav-burgundy hover:text-nav-burgundy'
+                ? 'bg-nav-burgundy dark:bg-dm-primary text-white border-nav-burgundy dark:border-dm-primary'
+                : 'border-nav-burgundy/40 dark:border-dm-secondary/40 text-nav-purple hover:border-nav-burgundy dark:hover:border-dm-secondary hover:text-nav-burgundy dark:hover:bg-dm-secondary/10'
             }`}
           >
             Todos
@@ -64,8 +64,8 @@ export default async function CatalogPage({ params, searchParams }: Props) {
               href={`/${locale}/catalog?categorySlug=${slug}`}
               className={`font-serif text-sm px-4 py-1.5 rounded-full border transition-all ${
                 categorySlug === slug
-                  ? 'bg-nav-burgundy text-white border-nav-burgundy'
-                  : 'border-nav-burgundy/40 text-nav-purple hover:border-nav-burgundy hover:text-nav-burgundy'
+                  ? 'bg-nav-burgundy dark:bg-dm-primary text-white border-nav-burgundy dark:border-dm-primary'
+                  : 'border-nav-burgundy/40 dark:border-dm-secondary/40 text-nav-purple hover:border-nav-burgundy dark:hover:border-dm-secondary hover:text-nav-burgundy dark:hover:bg-dm-secondary/10'
               }`}
             >
               {label}

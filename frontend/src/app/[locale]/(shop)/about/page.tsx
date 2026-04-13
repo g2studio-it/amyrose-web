@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Clock, Cake, ExternalLink, Instagram, Facebook, Youtube, Linkedin, Twitter, Link2 } from 'lucide-react';
+import { ExternalLink, Instagram, Facebook, Youtube, Linkedin, Twitter, Link2 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 
 interface Props {
@@ -9,40 +9,36 @@ interface Props {
 
 const PLATFORM_ICONS: Record<string, React.ElementType> = {
   instagram: Instagram,
-  facebook: Facebook,
-  youtube: Youtube,
-  linkedin: Linkedin,
-  twitter: Twitter,
-  tiktok: Link2,
-  whatsapp: Link2,
-  other: Link2,
+  facebook:  Facebook,
+  youtube:   Youtube,
+  linkedin:  Linkedin,
+  twitter:   Twitter,
+  tiktok:    Link2,
+  whatsapp:  Link2,
+  other:     ExternalLink,
 };
 
 const PLATFORM_COLORS: Record<string, string> = {
   instagram: 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400',
-  facebook: 'bg-blue-600',
-  youtube: 'bg-red-600',
-  linkedin: 'bg-blue-700',
-  twitter: 'bg-slate-800',
-  tiktok: 'bg-slate-900',
-  whatsapp: 'bg-green-500',
-  other: 'bg-[#6B1A2B]',
+  facebook:  'bg-blue-600',
+  youtube:   'bg-red-600',
+  linkedin:  'bg-blue-700',
+  twitter:   'bg-slate-800',
+  tiktok:    'bg-slate-900',
+  whatsapp:  'bg-green-500',
+  other:     'bg-[#6B1A2B]',
 };
 
 export default async function AboutPage({ params }: Props) {
   const { locale } = await params;
 
   const [articles, socialLinks] = await Promise.all([
-    prisma.post.findMany({
-      where: { isPublished: true },
-      orderBy: { publishedAt: 'desc' },
-    }).catch(() => []),
+    prisma.post
+      .findMany({ where: { isPublished: true }, orderBy: { publishedAt: 'desc' } })
+      .catch(() => []),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((prisma as any).socialLink as typeof prisma.socialLink | undefined)
-      ?.findMany({
-        where: { isActive: true },
-        orderBy: [{ sortOrder: 'asc' }, { platform: 'asc' }],
-      })
+      ?.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: 'asc' }, { platform: 'asc' }] })
       .catch(() => []) ?? Promise.resolve([]),
   ]);
 
@@ -80,8 +76,7 @@ export default async function AboutPage({ params }: Props) {
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
-            {/* Floating badge */}
-            <div className="absolute -bottom-5 -right-5 bg-card rounded-2xl shadow-xl px-5 py-4 border border-nav-lilac-divider/40">
+            <div className="absolute -bottom-5 -right-5 bg-white dark:bg-card rounded-2xl shadow-xl px-5 py-4 border border-nav-lilac-divider/40">
               <p className="font-serif font-bold text-nav-burgundy text-2xl">+8</p>
               <p className="font-serif text-xs text-nav-purple/70 uppercase tracking-wider">años de experiencia</p>
             </div>
@@ -89,9 +84,7 @@ export default async function AboutPage({ params }: Props) {
 
           <div className="space-y-6">
             <div>
-              <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
-                Mi historia
-              </p>
+              <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] dark:text-nav-burgundy mb-2">Mi historia</p>
               <h2 className="font-serif font-bold text-3xl text-nav-purple leading-snug">
                 Del amor por la cocina<br />a un sueño hecho realidad
               </h2>
@@ -120,42 +113,64 @@ export default async function AboutPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── Highlights ────────────────────────────────────────── */}
-      <section className="bg-section-tinted py-20 px-4">
-        <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-12">
-            <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
-              Por qué elegirme
-            </p>
-            <h2 className="font-serif font-bold text-3xl text-nav-purple">
-              Lo que me define
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {HIGHLIGHTS.map(({ icon: Icon, title, description }) => (
-              <div
-                key={title}
-                className="bg-card rounded-2xl p-6 border border-nav-burgundy/10 hover:border-nav-burgundy/30 hover:shadow-lg transition-all duration-300 text-center"
-              >
-                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-nav-burgundy/10 mb-4">
-                  <Icon className="h-6 w-6 text-nav-burgundy" />
-                </div>
-              </article>
-            ))}
+      {/* ── Articles ──────────────────────────────────────────── */}
+      {articles.length > 0 && (
+        <section className="bg-[#F9F5FB] dark:bg-[#322E37] py-20 px-4">
+          <div className="container mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] dark:text-nav-burgundy mb-2">Del blog</p>
+              <h2 className="font-serif font-bold text-3xl text-nav-purple">Artículos</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {articles.map((article: { id: string; title: string; excerpt: string | null; imageUrl: string | null; publishedAt: Date | null }) => (
+                <article
+                  key={article.id}
+                  className="bg-white dark:bg-card rounded-2xl border border-nav-burgundy/10 overflow-hidden hover:border-nav-burgundy/30 hover:shadow-xl dark:hover:shadow-[0_8px_30px_rgba(127,82,129,0.2)] transition-all duration-300 flex flex-col"
+                >
+                  {article.imageUrl ? (
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={article.imageUrl}
+                        alt={article.title}
+                        fill
+                        className="object-cover hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-linear-to-br from-nav-purple/10 to-nav-burgundy/10 flex items-center justify-center">
+                      <span className="text-4xl">🍰</span>
+                    </div>
+                  )}
+                  <div className="p-5 flex-1 flex flex-col gap-3">
+                    <h3 className="font-serif font-bold text-lg text-nav-purple leading-snug">
+                      {article.title}
+                    </h3>
+                    {article.excerpt && (
+                      <p className="text-sm text-nav-purple/65 leading-relaxed line-clamp-3 flex-1">
+                        {article.excerpt}
+                      </p>
+                    )}
+                    {article.publishedAt && (
+                      <p className="text-xs text-nav-purple/40">
+                        {new Date(article.publishedAt).toLocaleDateString('es-AR', {
+                          day: '2-digit', month: 'long', year: 'numeric',
+                        })}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
       )}
 
       {/* ── Process ───────────────────────────────────────────── */}
-      <section className={`px-4 py-20 max-w-4xl mx-auto ${articles.length > 0 ? 'border-t border-nav-burgundy/10' : ''}`}>
+      <section className="container mx-auto px-4 py-20 max-w-4xl">
         <div className="text-center mb-12">
-          <p className="font-serif text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
-            Cómo trabajo
-          </p>
-          <h2 className="font-serif font-bold text-3xl text-nav-purple">
-            El proceso de un pedido
-          </h2>
+          <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] dark:text-nav-burgundy mb-2">Cómo trabajo</p>
+          <h2 className="font-serif font-bold text-3xl text-nav-purple dark:text-[#F5E6F0]">El proceso de un pedido</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
@@ -164,9 +179,9 @@ export default async function AboutPage({ params }: Props) {
             { step: '03', title: 'Lo disfrutás', desc: 'Coordinamos la entrega o retiro y vos solo te preocupás de disfrutar cada mordida.' },
           ].map(({ step, title, desc }) => (
             <div key={step}>
-              <div className="font-serif font-extrabold text-6xl text-nav-burgundy/10 leading-none mb-2">{step}</div>
-              <h3 className="font-serif font-bold text-lg text-nav-purple mb-2">{title}</h3>
-              <p className="text-sm text-nav-purple/65 leading-relaxed">{desc}</p>
+              <div className="font-serif font-extrabold text-6xl text-nav-burgundy/10 dark:text-[#F5E6F0]/30 leading-none mb-2">{step}</div>
+              <h3 className="font-serif font-bold text-lg text-nav-purple dark:text-[#F5E6F0] mb-2">{title}</h3>
+              <p className="text-sm text-nav-purple/65 dark:text-[#F5E6F0]/70 leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -174,17 +189,16 @@ export default async function AboutPage({ params }: Props) {
 
       {/* ── Social networks ───────────────────────────────────── */}
       {socialLinks.length > 0 && (
-        <section className="bg-[#F9F5FB] py-16 px-4">
+        <section className="bg-[#F9F5FB] dark:bg-[#322E37] py-16 px-4">
           <div className="container mx-auto max-w-3xl text-center">
-            <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] mb-2">
+            <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] dark:text-nav-burgundy mb-2">
               Seguime en
             </p>
             <h2 className="font-serif font-bold text-3xl text-nav-purple mb-10">
               Redes sociales
             </h2>
-
             <div className="flex flex-wrap justify-center gap-4">
-              {socialLinks.map((link) => {
+              {socialLinks.map((link: { id: string; platform: string; label: string; url: string }) => {
                 const Icon = PLATFORM_ICONS[link.platform] ?? Link2;
                 const colorClass = PLATFORM_COLORS[link.platform] ?? 'bg-[#6B1A2B]';
                 return (
@@ -193,7 +207,7 @@ export default async function AboutPage({ params }: Props) {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-3 rounded-2xl border border-white bg-white px-5 py-3.5 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+                    className="group inline-flex items-center gap-3 rounded-2xl border border-nav-lilac-divider dark:border-dm-secondary/40 bg-white dark:bg-card px-5 py-3.5 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
                   >
                     <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${colorClass} text-white shrink-0`}>
                       <Icon className="h-4 w-4" />
@@ -216,7 +230,7 @@ export default async function AboutPage({ params }: Props) {
         </p>
         <Link
           href={`/${locale}/catalog`}
-          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-background text-nav-burgundy hover:bg-nav-lilac-bg transition-colors duration-200"
+          className="inline-flex font-serif font-semibold px-8 py-3.5 rounded-full bg-white dark:bg-dm-primary text-nav-burgundy dark:text-white hover:bg-nav-lilac-bg dark:hover:bg-dm-secondary transition-colors duration-200"
         >
           Ver el catálogo
         </Link>
