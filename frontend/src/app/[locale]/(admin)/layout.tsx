@@ -16,10 +16,5 @@ export default async function AdminLayout({
     redirect(`/${locale}/login`);
   }
 
-  return (
-    <div className="bg-background flex h-screen overflow-hidden">
-      <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
-    </div>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }
