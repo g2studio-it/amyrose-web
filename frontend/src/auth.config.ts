@@ -1,6 +1,5 @@
 import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import Google from 'next-auth/providers/google';
 import { loginSchema } from '@/schemas/auth.schema';
 import type { BackendAuthResponse } from '@/lib/api';
 
@@ -43,10 +42,6 @@ async function backendRefresh(refreshToken: string): Promise<BackendAuthResponse
 
 export default {
   providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
     Credentials({
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
