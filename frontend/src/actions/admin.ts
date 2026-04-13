@@ -36,7 +36,7 @@ export async function getDashboardStatsAction(): Promise<{
   ]);
 
   const revenue = revenueOrders.reduce(
-    (sum, o) => sum + Number(o.total),
+    (sum: number, o: { total: unknown }) => sum + Number(o.total),
     0,
   );
 
