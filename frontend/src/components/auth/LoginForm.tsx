@@ -2,23 +2,21 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
+import { Eye, EyeOff } from 'lucide-react';
 
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 export function LoginForm() {
-  const t = useTranslations('auth.login');
   const locale = useLocale();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -49,55 +47,86 @@ export function LoginForm() {
     router.refresh();
   };
 
+  const inputClass =
+    'w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none transition focus:border-[#C9A8D9] focus:ring-2 focus:ring-[#C9A8D9]/30 autofill:bg-transparent';
+
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">{t('email')}</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            {...register('email')}
-            className={errors.email ? 'border-destructive' : ''}
-          />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
-          )}
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Email */}
+      <div className="space-y-1.5">
+        <label htmlFor="email" className="block text-xs font-medium text-white/70 uppercase tracking-wide">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          autoComplete="email"
+          placeholder="tu@email.com"
+          {...register('email')}
+          className={`${inputClass} ${errors.email ? 'border-red-400/60 focus:border-red-400 focus:ring-red-400/20' : ''}`}
+        />
+        {errors.email && (
+          <p className="text-xs text-red-300">{errors.email.message}</p>
+        )}
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">{t('password')}</Label>
-          <Input
+      {/* Password */}
+      <div className="space-y-1.5">
+        <label htmlFor="password" className="block text-xs font-medium text-white/70 uppercase tracking-wide">
+          Contraseña
+        </label>
+        <div className="relative">
+          <input
             id="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
+            placeholder="••••••••"
             {...register('password')}
-            className={errors.password ? 'border-destructive' : ''}
+            className={`${inputClass} pr-10 ${errors.password ? 'border-red-400/60 focus:border-red-400 focus:ring-red-400/20' : ''}`}
           />
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
-          )}
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors"
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
         </div>
+        {errors.password && (
+          <p className="text-xs text-red-300">{errors.password.message}</p>
+        )}
+      </div>
 
-        <Button
-          type="submit"
-          className="w-full bg-brand-burgundy hover:bg-brand-burgundy/90"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Ingresando...' : t('submit')}
-        </Button>
-      </form>
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="mt-2 w-full rounded-xl bg-[#6B1A2B] hover:bg-[#8B2438] active:scale-[0.98] text-white font-serif font-semibold py-3 text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#6B1A2B]/40"
+      >
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Ingresando...
+          </span>
+        ) : (
+          'Ingresar'
+        )}
+      </button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        {t('noAccount')}{' '}
+      {/* Register link */}
+      <p className="text-center text-xs text-white/50 pt-1">
+        ¿No tenés cuenta?{' '}
         <Link
           href={`/${locale}/register`}
-          className="font-medium text-brand-burgundy hover:underline"
+          className="text-[#C9A8D9] hover:text-white font-medium transition-colors"
         >
-          {t('register')}
+          Registrate
         </Link>
       </p>
-    </div>
+    </form>
   );
 }
