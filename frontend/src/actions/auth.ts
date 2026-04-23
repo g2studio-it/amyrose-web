@@ -1,36 +1,9 @@
 'use server';
 
 import { signIn, signOut } from '@/auth';
-import { loginSchema, registerSchema, type LoginInput, type RegisterInput } from '@/schemas/auth.schema';
-import { AuthError } from 'next-auth';
+import { registerSchema, type RegisterInput } from '@/schemas/auth.schema';
 
 const BACKEND_BASE = (process.env.BACKEND_API_URL ?? 'http://localhost:3001/api/v1').replace(/\/$/, '');
-
-export async function loginAction(data: LoginInput) {
-  const parsed = loginSchema.safeParse(data);
-  if (!parsed.success) {
-    return { error: 'Datos inválidos' };
-  }
-
-  try {
-    await signIn('credentials', {
-      email: parsed.data.email,
-      password: parsed.data.password,
-      redirect: false,
-    });
-    return { success: true };
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return { error: 'Email o contraseña incorrectos' };
-        default:
-          return { error: 'Ocurrió un error al iniciar sesión' };
-      }
-    }
-    return { error: 'Ocurrió un error inesperado' };
-  }
-}
 
 export async function registerAction(data: RegisterInput) {
   const parsed = registerSchema.safeParse(data);
@@ -53,11 +26,7 @@ export async function registerAction(data: RegisterInput) {
   }
 
   try {
-    await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+    await signIn('credentials', { email, password, redirect: false });
     return { success: true };
   } catch {
     return { error: 'Cuenta creada. Por favor iniciá sesión.' };
