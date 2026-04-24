@@ -13,15 +13,28 @@ async function backendLogin(
   password: string,
 ): Promise<BackendAuthResponse | null> {
   try {
-    const res = await fetch(`${BACKEND_BASE}/auth/login`, {
+    const url = `${BACKEND_BASE}/auth/login`;
+    console.log('[backendLogin] POST', url);
+
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    if (!res.ok) return null;
+
+    console.log('[backendLogin] status:', res.status);
+
+    if (!res.ok) {
+      const body = await res.text();
+      console.error('[backendLogin] error body:', body);
+      return null;
+    }
+
     const json = await res.json();
+    console.log('[backendLogin] response keys:', Object.keys(json));
     return (json?.data ?? json) as BackendAuthResponse;
-  } catch {
+  } catch (err) {
+    console.error('[backendLogin] fetch failed:', err);
     return null;
   }
 }
