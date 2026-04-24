@@ -15,13 +15,25 @@ spec:
     - host: amyrose.g2studio.it.com
       http:
         paths:
-          - path: /api
+          # ✅ Más específico primero: NextAuth va al frontend
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 3000
+
+          # ✅ Backend NestJS solo recibe /api/v1/*
+          - path: /api/v1
             pathType: Prefix
             backend:
               service:
                 name: backend
                 port:
                   number: 3001
+
+          # ✅ Todo lo demás va al frontend
           - path: /
             pathType: Prefix
             backend:
