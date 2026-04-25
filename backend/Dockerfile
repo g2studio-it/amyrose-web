@@ -1,20 +1,28 @@
 # ─── Stage 1: Dependencies ───────────────────────────────────────────────────
 FROM node:20-alpine AS deps
-WORKDIR /app
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm@10
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN --mount=type=cache,id=pnpm-backend,target=/pnpm/store \
+    pnpm install --frozen-lockfile --ignore-scripts
 
 # ─── Stage 2: Build ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
-WORKDIR /app
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npm run build
+RUN pnpm run build
 
 # ─── Stage 3: Runner ────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
