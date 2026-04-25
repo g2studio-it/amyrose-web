@@ -5,6 +5,6 @@ import authConfig from './auth.config';
 // No database adapter — user data comes from the backend JWT and is
 // embedded in the NextAuth token via the jwt() callback in auth.config.ts.
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: 'jwt' },
+  session: { strategy: 'jwt', maxAge: 2 * 60 * 60 },
   ...authConfig,
 });

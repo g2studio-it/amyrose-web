@@ -5,20 +5,30 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema';
 
-export function LoginForm() {
+interface LoginFormProps {
+  initialError?: string;
+}
+
+export function LoginForm({ initialError }: LoginFormProps) {
   const locale = useLocale();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (initialError) {
+      toast.error(initialError);
+    }
+  }, [initialError]);
 
   const {
     register,
@@ -39,27 +49,31 @@ export function LoginForm() {
 
     setIsLoading(true);
 
-    const result = await signIn('credentials', {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-    setIsLoading(false);
-
-    if (!result?.ok) {
-      const next = attempts + 1;
-      setAttempts(next);
-      if (next >= 5) {
-        setLockedUntil(Date.now() + 30_000);
+      if (!result?.ok) {
+        const next = attempts + 1;
+        setAttempts(next);
+        if (next >= 5) {
+          setLockedUntil(Date.now() + 30_000);
+        }
+        toast.error('Email o contraseña incorrectos');
+        return;
       }
-      toast.error('Email o contraseña incorrectos');
-      return;
-    }
 
-    toast.success('¡Bienvenida!');
-    router.push(`/${locale}`);
-    router.refresh();
+      toast.success('¡Bienvenida!');
+      router.push(`/${locale}`);
+      router.refresh();
+    } catch {
+      toast.error('Error al iniciar sesión. Intentá de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const inputClass =
