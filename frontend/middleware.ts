@@ -36,7 +36,7 @@ export default auth((req) => {
   const isAdmin = session?.user?.role === 'ADMIN';
 
   // ── Admin-only ──────────────────────────────────────────────────────────
-  if (pathWithoutLocale.startsWith(ADMIN_PREFIX)) {
+  if (pathWithoutLocale === ADMIN_PREFIX || pathWithoutLocale.startsWith(`${ADMIN_PREFIX}/`)) {
     if (!isAdmin) {
       const url = req.nextUrl.clone();
       url.pathname = `/${locale}/login`;

@@ -17,6 +17,8 @@ export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
 
   const {
     register,
@@ -26,7 +28,15 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  const cooldownSeconds = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
+  const isLocked = lockedUntil !== null && Date.now() < lockedUntil;
+
   const onSubmit = async (data: LoginInput) => {
+    if (isLocked) {
+      toast.error(`Demasiados intentos. Esperá ${cooldownSeconds}s antes de volver a intentar.`);
+      return;
+    }
+
     setIsLoading(true);
 
     const result = await signIn('credentials', {
@@ -38,6 +48,11 @@ export function LoginForm() {
     setIsLoading(false);
 
     if (!result?.ok) {
+      const next = attempts + 1;
+      setAttempts(next);
+      if (next >= 5) {
+        setLockedUntil(Date.now() + 30_000);
+      }
       toast.error('Email o contraseña incorrectos');
       return;
     }
@@ -101,7 +116,7 @@ export function LoginForm() {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || isLocked}
         className="mt-2 w-full rounded-xl bg-[#6B1A2B] hover:bg-[#8B2438] active:scale-[0.98] text-white font-serif font-semibold py-3 text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#6B1A2B]/40"
       >
         {isLoading ? (
@@ -112,6 +127,8 @@ export function LoginForm() {
             </svg>
             Ingresando...
           </span>
+        ) : isLocked ? (
+          `Bloqueado ${cooldownSeconds}s`
         ) : (
           'Ingresar'
         )}
