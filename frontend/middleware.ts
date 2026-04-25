@@ -54,7 +54,10 @@ export default auth((req) => {
   }
 
   // ── Redirect authenticated users away from auth pages ───────────────────
-  if (AUTH_PAGES.some((p) => pathWithoutLocale.startsWith(p))) {
+  // Skip redirect if there's an ?error param — NextAuth lands here on failed
+  // login and a stale/partial session cookie must not bounce the user to Home.
+  const hasErrorParam = req.nextUrl.searchParams.has('error');
+  if (!hasErrorParam && AUTH_PAGES.some((p) => pathWithoutLocale.startsWith(p))) {
     if (isAuthenticated) {
       const url = req.nextUrl.clone();
       url.pathname = isAdmin ? `/${locale}/admin/dashboard` : `/${locale}`;

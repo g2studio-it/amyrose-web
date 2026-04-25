@@ -56,7 +56,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
         redirect: false,
       });
 
-      if (!result?.ok) {
+      if (!result?.ok || result?.error) {
         const next = attempts + 1;
         setAttempts(next);
         if (next >= 5) {
