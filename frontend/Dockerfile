@@ -2,13 +2,10 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-RUN corepack enable && \
-    if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    else npm install; fi
+RUN npm install -g pnpm@9 --quiet && pnpm install --frozen-lockfile
 
 RUN npx prisma generate
 
@@ -21,7 +18,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN corepack enable && npm run build
+RUN npm run build
 
 # ─── Stage 3: Migrator (used by migration job) ──────────────────────────────
 FROM node:20-alpine AS migrator

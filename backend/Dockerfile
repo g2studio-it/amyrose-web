@@ -2,12 +2,9 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml ./
 
-RUN corepack enable && \
-    if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    else npm install; fi
+RUN npm install -g pnpm@9 --quiet && pnpm install --frozen-lockfile
 
 # ─── Stage 2: Build ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
@@ -16,7 +13,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN corepack enable && npm run build
+RUN npm run build
 
 # ─── Stage 3: Runner ────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
