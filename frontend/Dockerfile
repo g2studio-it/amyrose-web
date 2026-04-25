@@ -5,9 +5,9 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-RUN npm install -g pnpm@9 --quiet && pnpm install --frozen-lockfile
-
-RUN npx prisma generate
+RUN npm install -g pnpm@10
+RUN pnpm install --frozen-lockfile
+RUN pnpm exec prisma generate
 
 # ─── Stage 2: Build ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
