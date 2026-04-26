@@ -29,6 +29,8 @@ spec:
                 name: backend
                 port:
                   number: 3001
+
+          # ✅ Todo lo demás va al frontend
           - path: /
             pathType: Prefix
             backend:
