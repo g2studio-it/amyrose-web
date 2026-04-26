@@ -175,12 +175,12 @@ export function CreateProductDialog({ categories }: Props) {
 
       {/* Dialog */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
 
-          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" style={{ maxHeight: '92vh' }}>
+          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl max-h-[96svh] md:max-h-[92vh]">
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-[#6B1A2B]/10 px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-[#6B1A2B]/10 px-4 py-3 md:px-6 md:py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#6B1A2B]/10">
                   <PackagePlus className="h-4 w-4 text-[#6B1A2B]" />
@@ -198,10 +198,10 @@ export function CreateProductDialog({ categories }: Props) {
               </button>
             </div>
 
-            {/* Body — two columns */}
-            <form onSubmit={handleSubmit} className="flex flex-1 overflow-hidden">
+            {/* Body — stacked on mobile, two columns on md+ */}
+            <form onSubmit={handleSubmit} className="flex flex-1 min-h-0 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
               {/* Left: info + variants */}
-              <div className="flex w-80 shrink-0 flex-col overflow-y-auto border-r border-[#6B1A2B]/8 px-5 py-5 space-y-5">
+              <div className="flex flex-col shrink-0 border-b border-[#6B1A2B]/8 px-4 py-4 space-y-5 md:w-80 md:overflow-y-auto md:border-b-0 md:border-r md:px-5 md:py-5">
                 {/* Basic info */}
                 <div className="space-y-4">
                   <p className={SECTION_TITLE}>Información básica</p>
@@ -351,7 +351,7 @@ export function CreateProductDialog({ categories }: Props) {
               </div>
 
               {/* Right: images + submit */}
-              <div className="flex flex-1 flex-col overflow-y-auto px-5 py-5">
+              <div className="flex flex-col px-4 py-4 md:flex-1 md:overflow-y-auto md:px-5 md:py-5">
                 <div className="flex-1 space-y-4">
                   <p className={SECTION_TITLE}>Imágenes</p>
 
@@ -458,7 +458,7 @@ export function CreateProductDialog({ categories }: Props) {
                 </div>
 
                 {/* Actions */}
-                <div className="mt-5 shrink-0 flex items-center justify-end gap-3 border-t border-[#6B1A2B]/10 pt-4">
+                <div className="mt-5 flex items-center justify-end gap-3 border-t border-[#6B1A2B]/10 pt-4 pb-1">
                   <button
                     type="button"
                     onClick={handleClose}
