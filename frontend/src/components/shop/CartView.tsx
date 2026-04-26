@@ -57,7 +57,8 @@ export function CartView({ locale }: CartViewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Cart items */}
       <div className="space-y-4 lg:col-span-2">
         {items.map((item) => (
@@ -178,7 +179,7 @@ export function CartView({ locale }: CartViewProps) {
           </Link>
         </div>
       </div>
-    </div>
+      </div>
 
       {modalOpen && (
         <CheckoutModal
@@ -188,6 +189,6 @@ export function CartView({ locale }: CartViewProps) {
           onSuccess={clearCart}
         />
       )}
-    </div>
+    </>
   );
 }
