@@ -5,10 +5,11 @@ import Image from 'next/image';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 import { useCart } from '@/hooks/useCart';
-import { createOrderAction } from '@/actions/orders';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { CheckoutModal } from './CheckoutModal';
 
 interface CartViewProps {
   locale: string;
@@ -16,34 +17,23 @@ interface CartViewProps {
 
 export function CartView({ locale }: CartViewProps) {
   const t = useTranslations('cart');
-  const { items, removeItem, updateQuantity, clearCart, totalPrice } =
-    useCart();
+  const { data: session } = useSession();
+  const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCart();
   const router = useRouter();
-  const [isOrdering, setIsOrdering] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleRemove = (variantId: string, name: string) => {
     removeItem(variantId);
     toast.success(`${name} eliminado del carrito`);
   };
 
-  const handleCheckout = async () => {
-    setIsOrdering(true);
-    try {
-      const order = await createOrderAction();
-      clearCart();
-      router.push(`/${locale}/orders`);
-      toast.success(`Pedido #${order.id.slice(0, 8)} creado con éxito`);
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : 'Error al crear el pedido';
-      toast.error(
-        msg.includes('autenticado')
-          ? 'Debés iniciar sesión para hacer un pedido'
-          : msg
-      );
-    } finally {
-      setIsOrdering(false);
+  const handleCheckoutClick = () => {
+    if (!session?.user) {
+      toast.error('Debés iniciar sesión para realizar un pedido');
+      router.push(`/${locale}/login`);
+      return;
     }
+    setModalOpen(true);
   };
 
   if (items.length === 0) {
@@ -174,11 +164,10 @@ export function CartView({ locale }: CartViewProps) {
           </div>
 
           <button
-            onClick={handleCheckout}
-            disabled={isOrdering}
-            className="from-brand-burgundy to-brand-violet w-full rounded-2xl bg-gradient-to-r py-3 font-bold text-white transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleCheckoutClick}
+            className="from-brand-burgundy to-brand-violet w-full rounded-2xl bg-gradient-to-r py-3 font-bold text-white transition-all hover:shadow-lg"
           >
-            {isOrdering ? 'Procesando...' : t('checkout')}
+            {t('checkout')}
           </button>
 
           <Link
@@ -189,6 +178,16 @@ export function CartView({ locale }: CartViewProps) {
           </Link>
         </div>
       </div>
+    </div>
+
+      {modalOpen && (
+        <CheckoutModal
+          items={items}
+          totalPrice={totalPrice}
+          onClose={() => setModalOpen(false)}
+          onSuccess={clearCart}
+        />
+      )}
     </div>
   );
 }
