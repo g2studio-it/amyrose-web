@@ -5,18 +5,30 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema';
 
-export function LoginForm() {
+interface LoginFormProps {
+  initialError?: string;
+}
+
+export function LoginForm({ initialError }: LoginFormProps) {
   const locale = useLocale();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (initialError) {
+      toast.error(initialError);
+    }
+  }, [initialError]);
 
   const {
     register,
@@ -26,25 +38,42 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  const cooldownSeconds = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
+  const isLocked = lockedUntil !== null && Date.now() < lockedUntil;
+
   const onSubmit = async (data: LoginInput) => {
-    setIsLoading(true);
-
-    const result = await signIn('credentials', {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
-
-    setIsLoading(false);
-
-    if (!result?.ok) {
-      toast.error('Email o contraseña incorrectos');
+    if (isLocked) {
+      toast.error(`Demasiados intentos. Esperá ${cooldownSeconds}s antes de volver a intentar.`);
       return;
     }
 
-    toast.success('¡Bienvenida!');
-    router.push(`/${locale}`);
-    router.refresh();
+    setIsLoading(true);
+
+    try {
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (!result?.ok || result?.error) {
+        const next = attempts + 1;
+        setAttempts(next);
+        if (next >= 5) {
+          setLockedUntil(Date.now() + 30_000);
+        }
+        toast.error('Email o contraseña incorrectos');
+        return;
+      }
+
+      toast.success('¡Bienvenida!');
+      router.push(`/${locale}`);
+      router.refresh();
+    } catch {
+      toast.error('Error al iniciar sesión. Intentá de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const inputClass =
@@ -101,7 +130,7 @@ export function LoginForm() {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || isLocked}
         className="mt-2 w-full rounded-xl bg-[#6B1A2B] hover:bg-[#8B2438] active:scale-[0.98] text-white font-serif font-semibold py-3 text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#6B1A2B]/40"
       >
         {isLoading ? (
@@ -112,6 +141,8 @@ export function LoginForm() {
             </svg>
             Ingresando...
           </span>
+        ) : isLocked ? (
+          `Bloqueado ${cooldownSeconds}s`
         ) : (
           'Ingresar'
         )}

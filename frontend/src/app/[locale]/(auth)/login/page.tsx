@@ -6,15 +6,20 @@ import { LoginForm } from '@/components/auth/LoginForm';
 
 interface Props {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
 }
 
-export default async function LoginPage({ params }: Props) {
+export default async function LoginPage({ params, searchParams }: Props) {
   const { locale } = await params;
+  const { error } = await searchParams;
 
   const session = await auth();
   if (session?.user) {
     redirect(session.user.role === 'ADMIN' ? `/${locale}/admin/dashboard` : `/${locale}`);
   }
+
+  const initialError =
+    error === 'CredentialsSignin' ? 'Email o contraseña incorrectos' : undefined;
 
   return (
     <div className="relative min-h-screen overflow-hidden flex items-center justify-center">
@@ -72,7 +77,7 @@ export default async function LoginPage({ params }: Props) {
           <h2 className="font-serif font-semibold text-xl text-white/90 mb-6 text-center">
             Iniciar sesión
           </h2>
-          <LoginForm />
+          <LoginForm initialError={initialError} />
         </div>
 
         {/* Back link */}

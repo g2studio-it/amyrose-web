@@ -19,6 +19,11 @@ import { JwtPayload } from '../../common/decorators/current-user.decorator';
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
+  private maskEmail(email: string): string {
+    const [local, domain] = email.split('@');
+    return `${local.slice(0, 2)}***@${domain}`;
+  }
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -37,7 +42,8 @@ export class AuthService {
     if (!valid) return null;
 
     if (!user.isActive) {
-      throw new UnauthorizedException('Cuenta desactivada. Contacta con soporte.');
+      this.logger.warn(`Login attempt on inactive account: ${user.id}`);
+      return null;
     }
 
     return user;
@@ -47,11 +53,11 @@ export class AuthService {
    * Register a new user and return a token pair.
    */
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
-    this.logger.log(`New registration: ${dto.email}`);
+    this.logger.log(`New registration: ${this.maskEmail(dto.email)}`);
 
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
-      throw new ConflictException('Ya existe una cuenta con este email');
+      throw new ConflictException('No se pudo completar el registro. Intentá con otro email o iniciá sesión.');
     }
 
     const user = await this.usersService.create(dto);
@@ -68,7 +74,7 @@ export class AuthService {
    * Login and return a token pair.
    */
   async login(user: User): Promise<AuthResponseDto> {
-    this.logger.log(`Login: ${user.email}`);
+    this.logger.log(`Login: ${this.maskEmail(user.email)}`);
     const tokens = await this.issueTokens(user);
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
 

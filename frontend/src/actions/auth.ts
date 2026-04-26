@@ -20,9 +20,9 @@ export async function registerAction(data: RegisterInput) {
   });
 
   if (!res.ok) {
-    const json = await res.json().catch(() => ({}));
-    const msg = json?.message ?? 'Error al crear la cuenta';
-    return { error: Array.isArray(msg) ? msg[0] : msg };
+    if (res.status === 409) return { error: 'No se pudo completar el registro. Intentá con otro email o iniciá sesión.' };
+    if (res.status === 400) return { error: 'Los datos ingresados no son válidos.' };
+    return { error: 'Error al crear la cuenta. Intentá de nuevo.' };
   }
 
   try {

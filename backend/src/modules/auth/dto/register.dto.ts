@@ -5,17 +5,19 @@ import {
   MinLength,
   MaxLength,
   IsOptional,
+  Matches,
 } from 'class-validator';
 
 export class RegisterDto {
   @ApiProperty({ example: 'maria@example.com' })
   @IsEmail({}, { message: 'El email no es válido' })
+  @MaxLength(254)
   email!: string;
 
   @ApiProperty({ example: 'mipass123', minLength: 6 })
   @IsString()
   @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
-  @MaxLength(128)
+  @MaxLength(72, { message: 'La contraseña no puede exceder 72 caracteres' })
   password!: string;
 
   @ApiProperty({ example: 'María García', required: false })
@@ -28,5 +30,6 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   @MaxLength(30)
+  @Matches(/^\+?[\d\s\-().]{7,30}$/, { message: 'Formato de teléfono inválido' })
   phone?: string;
 }
