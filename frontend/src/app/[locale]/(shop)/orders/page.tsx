@@ -6,6 +6,7 @@ import { getOrdersAction } from '@/actions/orders';
 
 interface Props {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ payment?: string; orderId?: string }>;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -17,18 +18,51 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-red-100 text-red-800',
 };
 
-export default async function OrdersPage({ params }: Props) {
+const PAYMENT_BANNERS = {
+  success: {
+    bg: 'bg-green-50 border-green-200',
+    text: 'text-green-800',
+    icon: '✅',
+    message: 'Tu pago con MercadoPago fue aprobado. ¡Gracias por tu compra!',
+  },
+  failure: {
+    bg: 'bg-red-50 border-red-200',
+    text: 'text-red-800',
+    icon: '❌',
+    message: 'Hubo un problema al procesar el pago con MercadoPago. Podés intentar nuevamente o elegir otro método.',
+  },
+  pending: {
+    bg: 'bg-yellow-50 border-yellow-200',
+    text: 'text-yellow-800',
+    icon: '⏳',
+    message: 'Tu pago con MercadoPago está pendiente de acreditación. Te notificaremos cuando se confirme.',
+  },
+} as const;
+
+export default async function OrdersPage({ params, searchParams }: Props) {
   const { locale } = await params;
+  const { payment } = await searchParams;
   const session = await auth();
   if (!session?.user) redirect(`/${locale}/login`);
 
   const t = await getTranslations('orders');
   const orders = await getOrdersAction();
 
+  const banner = payment && payment in PAYMENT_BANNERS
+    ? PAYMENT_BANNERS[payment as keyof typeof PAYMENT_BANNERS]
+    : null;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="mb-8 text-3xl font-extrabold text-brand-burgundy">{t('title')}</h1>
+        <h1 className="mb-6 text-3xl font-extrabold text-brand-burgundy">{t('title')}</h1>
+
+        {banner && (
+          <div className={`mb-6 flex items-start gap-3 rounded-2xl border px-5 py-4 ${banner.bg}`}>
+            <span className="text-xl leading-none">{banner.icon}</span>
+            <p className={`text-sm font-medium ${banner.text}`}>{banner.message}</p>
+          </div>
+        )}
 
         {orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-4">

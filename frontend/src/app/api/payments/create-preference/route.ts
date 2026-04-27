@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { orderId } = await req.json();
+    const { orderId, locale = 'es' } = await req.json();
 
     const order = await prisma.order.findUnique({
       where: { id: orderId, userId: session.user.id },
@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+    const ordersUrl = `${appUrl}/${locale}/orders`;
 
     const preference = await preferenceClient.create({
       body: {
@@ -33,9 +34,9 @@ export async function POST(req: NextRequest) {
           currency_id: 'ARS',
         })),
         back_urls: {
-          success: `${appUrl}/es/checkout/success?orderId=${orderId}`,
-          failure: `${appUrl}/es/checkout?orderId=${orderId}&status=failure`,
-          pending: `${appUrl}/es/checkout/success?orderId=${orderId}&status=pending`,
+          success: `${ordersUrl}?payment=success&orderId=${orderId}`,
+          failure: `${ordersUrl}?payment=failure&orderId=${orderId}`,
+          pending: `${ordersUrl}?payment=pending&orderId=${orderId}`,
         },
         auto_return: 'approved',
         external_reference: orderId,
