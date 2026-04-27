@@ -37,9 +37,9 @@ function slugify(text: string) {
 }
 
 const INPUT =
-  'w-full rounded-lg border border-[#6B1A2B]/20 bg-white px-3 py-2 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:border-[#6B1A2B]/50 focus:outline-none focus:ring-2 focus:ring-[#6B1A2B]/10';
+  'w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none focus:ring-2 focus:ring-brand-burgundy/10';
 
-const LABEL = 'text-xs font-medium text-[#3B1F5E]';
+const LABEL = 'text-xs font-medium text-nav-purple';
 const SECTION_TITLE =
   'text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A98EC5]';
 
@@ -178,21 +178,21 @@ export function CreateProductDialog({ categories }: Props) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
 
-          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl max-h-[96svh] md:max-h-[92vh]">
+          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-card shadow-2xl max-h-[96svh] md:max-h-[92vh]">
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-[#6B1A2B]/10 px-4 py-3 md:px-6 md:py-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 md:px-6 md:py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#6B1A2B]/10">
-                  <PackagePlus className="h-4 w-4 text-[#6B1A2B]" />
+                  <PackagePlus className="h-4 w-4 text-brand-burgundy" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-[#3B1F5E]">Nuevo producto</h2>
-                  <p className="text-xs text-[#3B1F5E]/50">Completá los datos para agregar un producto</p>
+                  <h2 className="text-base font-semibold text-nav-purple">Nuevo producto</h2>
+                  <p className="text-xs text-muted-foreground">Completá los datos para agregar un producto</p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                className="rounded-lg p-1.5 text-[#3B1F5E]/40 transition-colors hover:bg-[#F9F5FB] hover:text-[#3B1F5E]"
+                className="rounded-lg p-1.5 text-muted-foreground/70 transition-colors hover:bg-muted hover:text-nav-purple"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -201,13 +201,13 @@ export function CreateProductDialog({ categories }: Props) {
             {/* Body — stacked on mobile, two columns on md+ */}
             <form onSubmit={handleSubmit} className="flex flex-1 min-h-0 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
               {/* Left: info + variants */}
-              <div className="flex flex-col shrink-0 border-b border-[#6B1A2B]/8 px-4 py-4 space-y-5 md:w-80 md:overflow-y-auto md:border-b-0 md:border-r md:px-5 md:py-5">
+              <div className="flex flex-col shrink-0 border-b border-border px-4 py-4 space-y-5 md:w-80 md:overflow-y-auto md:border-b-0 md:border-r md:px-5 md:py-5">
                 {/* Basic info */}
                 <div className="space-y-4">
                   <p className={SECTION_TITLE}>Información básica</p>
 
                   <div className="space-y-1.5">
-                    <label className={LABEL}>Nombre <span className="text-[#6B1A2B]">*</span></label>
+                    <label className={LABEL}>Nombre <span className="text-brand-burgundy">*</span></label>
                     <input
                       required
                       value={name}
@@ -218,7 +218,7 @@ export function CreateProductDialog({ categories }: Props) {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className={LABEL}>Slug <span className="text-[#6B1A2B]">*</span></label>
+                    <label className={LABEL}>Slug <span className="text-brand-burgundy">*</span></label>
                     <input
                       required
                       value={slug}
@@ -229,7 +229,7 @@ export function CreateProductDialog({ categories }: Props) {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className={LABEL}>Categoría <span className="text-[#6B1A2B]">*</span></label>
+                    <label className={LABEL}>Categoría <span className="text-brand-burgundy">*</span></label>
                     <div className="relative">
                       <select
                         required
@@ -242,7 +242,7 @@ export function CreateProductDialog({ categories }: Props) {
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                       </select>
-                      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#3B1F5E]/40" />
+                      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/70" />
                     </div>
                   </div>
 
@@ -257,14 +257,14 @@ export function CreateProductDialog({ categories }: Props) {
                     />
                   </div>
 
-                  <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[#6B1A2B]/15 px-3 py-2">
+                  <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border px-3 py-2">
                     <input
                       type="checkbox"
                       checked={isFeatured}
                       onChange={(e) => setIsFeatured(e.target.checked)}
                       className="h-4 w-4 accent-[#6B1A2B]"
                     />
-                    <span className="text-sm text-[#3B1F5E]/70">Marcar como destacado</span>
+                    <span className="text-sm text-muted-foreground">Marcar como destacado</span>
                   </label>
                 </div>
 
@@ -272,12 +272,12 @@ export function CreateProductDialog({ categories }: Props) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <p className={SECTION_TITLE}>
-                      Variantes <span className="normal-case text-[#6B1A2B]">*</span>
+                      Variantes <span className="normal-case text-brand-burgundy">*</span>
                     </p>
                     <button
                       type="button"
                       onClick={addVariant}
-                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[#6B1A2B] transition-colors hover:bg-[#6B1A2B]/8"
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-brand-burgundy transition-colors hover:bg-[#6B1A2B]/8"
                     >
                       <Plus className="h-3 w-3" />
                       Agregar
@@ -286,9 +286,9 @@ export function CreateProductDialog({ categories }: Props) {
 
                   <div className="space-y-2">
                     {variants.map((variant, index) => (
-                      <div key={index} className="rounded-lg border border-[#6B1A2B]/12 bg-[#F9F5FB]/50 p-3">
+                      <div key={index} className="rounded-lg border border-border bg-muted/50 p-3">
                         <div className="mb-2 flex items-center justify-between">
-                          <span className="text-xs font-medium text-[#3B1F5E]/50">Variante {index + 1}</span>
+                          <span className="text-xs font-medium text-muted-foreground">Variante {index + 1}</span>
                           {variants.length > 1 && (
                             <button
                               type="button"
@@ -302,45 +302,45 @@ export function CreateProductDialog({ categories }: Props) {
 
                         <div className="grid grid-cols-2 gap-2">
                           <div className="col-span-2 space-y-1">
-                            <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">Nombre *</label>
+                            <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Nombre *</label>
                             <input
                               required
                               value={variant.name}
                               onChange={(e) => updateVariant(index, 'name', e.target.value)}
                               placeholder="Ej: Chico"
-                              className="w-full rounded-md border border-[#6B1A2B]/20 bg-white px-2.5 py-1.5 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:border-[#6B1A2B]/50 focus:outline-none"
+                              className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none"
                             />
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">Precio *</label>
+                            <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Precio *</label>
                             <div className="relative">
-                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#3B1F5E]/40">$</span>
+                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground/70">$</span>
                               <input
                                 required type="number" min="0" step="0.01"
                                 value={variant.price}
                                 onChange={(e) => updateVariant(index, 'price', e.target.value)}
                                 placeholder="0"
-                                className="w-full rounded-md border border-[#6B1A2B]/20 bg-white py-1.5 pl-6 pr-2 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:border-[#6B1A2B]/50 focus:outline-none"
+                                className="w-full rounded-md border border-border bg-card py-1.5 pl-6 pr-2 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none"
                               />
                             </div>
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">Stock</label>
+                            <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Stock</label>
                             <input
                               type="number" min="0"
                               value={variant.stock}
                               onChange={(e) => updateVariant(index, 'stock', e.target.value)}
                               placeholder="0"
-                              className="w-full rounded-md border border-[#6B1A2B]/20 bg-white px-2.5 py-1.5 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:border-[#6B1A2B]/50 focus:outline-none"
+                              className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none"
                             />
                           </div>
                           <div className="col-span-2 space-y-1">
-                            <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">SKU</label>
+                            <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">SKU</label>
                             <input
                               value={variant.sku}
                               onChange={(e) => updateVariant(index, 'sku', e.target.value)}
                               placeholder="Opcional"
-                              className="w-full rounded-md border border-[#6B1A2B]/20 bg-white px-2.5 py-1.5 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:border-[#6B1A2B]/50 focus:outline-none"
+                              className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none"
                             />
                           </div>
                         </div>
@@ -357,10 +357,10 @@ export function CreateProductDialog({ categories }: Props) {
 
                   {/* Current image list */}
                   {images.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[#6B1A2B]/15 py-10 text-[#3B1F5E]/30">
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border py-10 text-muted-foreground/50">
                       <ImageIcon className="h-8 w-8 opacity-40" />
                       <p className="text-xs">Sin imágenes aún</p>
-                      <p className="text-[10px] text-[#3B1F5E]/20">La primera que agregues será la principal</p>
+                      <p className="text-[10px] text-nav-purple/20">La primera que agregues será la principal</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -370,11 +370,11 @@ export function CreateProductDialog({ categories }: Props) {
                           className={`flex items-center gap-3 rounded-lg border p-2.5 transition-colors ${
                             img.isPrimary
                               ? 'border-amber-200 bg-amber-50/50'
-                              : 'border-[#6B1A2B]/12 bg-[#F9F5FB]/50'
+                              : 'border-border bg-muted/50'
                           }`}
                         >
                           {/* Preview */}
-                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-[#6B1A2B]/10 bg-[#F9F5FB]">
+                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
                             <img
                               src={img.url}
                               alt={img.altText || ''}
@@ -387,9 +387,9 @@ export function CreateProductDialog({ categories }: Props) {
 
                           {/* Info */}
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-xs font-medium text-[#3B1F5E]">{img.url}</p>
+                            <p className="truncate text-xs font-medium text-nav-purple">{img.url}</p>
                             {img.altText && (
-                              <p className="truncate text-[10px] text-[#3B1F5E]/40">{img.altText}</p>
+                              <p className="truncate text-[10px] text-muted-foreground/70">{img.altText}</p>
                             )}
                           </div>
 
@@ -424,8 +424,8 @@ export function CreateProductDialog({ categories }: Props) {
                   )}
 
                   {/* Add image form */}
-                  <div className="space-y-2 rounded-lg border border-dashed border-[#6B1A2B]/20 p-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-[#3B1F5E]/40">
+                  <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
                       Agregar imagen
                     </p>
                     <input
@@ -448,7 +448,7 @@ export function CreateProductDialog({ categories }: Props) {
                         type="button"
                         onClick={addImage}
                         disabled={!newImageUrl.trim()}
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-2 text-xs font-medium text-[#6B1A2B] transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-2 text-xs font-medium text-brand-burgundy transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         Agregar
@@ -458,12 +458,12 @@ export function CreateProductDialog({ categories }: Props) {
                 </div>
 
                 {/* Actions */}
-                <div className="mt-5 flex items-center justify-end gap-3 border-t border-[#6B1A2B]/10 pt-4 pb-1">
+                <div className="mt-5 flex items-center justify-end gap-3 border-t border-border pt-4 pb-1">
                   <button
                     type="button"
                     onClick={handleClose}
                     disabled={isPending}
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-[#3B1F5E]/60 transition-colors hover:bg-[#F9F5FB] hover:text-[#3B1F5E] disabled:opacity-50"
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-nav-purple disabled:opacity-50"
                   >
                     Cancelar
                   </button>

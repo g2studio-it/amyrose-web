@@ -16,7 +16,7 @@ export function ProductsTable({ products, categories }: Props) {
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3 text-[#3B1F5E]/40 dark:text-[#F5E6F0]/40">
+      <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground/70 dark:text-[#F5E6F0]/40">
         <Package className="h-10 w-10 opacity-30" />
         <p className="text-sm">No hay productos registrados</p>
       </div>
@@ -29,7 +29,7 @@ export function ProductsTable({ products, categories }: Props) {
       <div className="overflow-x-auto hidden sm:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[#F9F5FB] dark:bg-[#3D3845] text-[#3B1F5E]/50 dark:text-[#F5E6F0]/60 text-xs uppercase tracking-wide">
+            <tr className="bg-muted dark:bg-[#3D3845] text-muted-foreground dark:text-[#F5E6F0]/60 text-xs uppercase tracking-wide">
               <th className="px-6 py-3 text-left font-medium">Producto</th>
               <th className="px-6 py-3 text-left font-medium">Categoría</th>
               <th className="px-6 py-3 text-left font-medium">Variantes</th>
@@ -38,7 +38,7 @@ export function ProductsTable({ products, categories }: Props) {
               <th className="px-6 py-3 text-right font-medium">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#6B1A2B]/6 dark:divide-dm-secondary/20">
+          <tbody className="divide-y divide-border dark:divide-dm-secondary/20">
             {products.map((product) => {
               const activeVariants = product.variants.filter((v) => v.isActive);
               const minPrice = activeVariants.length
@@ -47,34 +47,34 @@ export function ProductsTable({ products, categories }: Props) {
               const totalStock = activeVariants.reduce((sum, v) => sum + v.stock, 0);
 
               return (
-                <tr key={product.id} className="hover:bg-[#F9F5FB] dark:hover:bg-[#3D3845] transition-colors">
+                <tr key={product.id} className="hover:bg-muted dark:hover:bg-[#3D3845] transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {product.images[0] ? (
                         <img
                           src={product.images[0].url}
                           alt={product.name}
-                          className="h-9 w-9 rounded-lg object-cover border border-[#6B1A2B]/10 dark:border-dm-secondary/20 shrink-0"
+                          className="h-9 w-9 rounded-lg object-cover border border-border dark:border-dm-secondary/20 shrink-0"
                         />
                       ) : (
-                        <div className="h-9 w-9 rounded-lg bg-[#F9F5FB] dark:bg-[#3D3845] flex items-center justify-center shrink-0">
+                        <div className="h-9 w-9 rounded-lg bg-muted dark:bg-[#3D3845] flex items-center justify-center shrink-0">
                           <Package className="h-4 w-4 text-[#A98EC5] dark:text-nav-burgundy" />
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="font-medium text-[#3B1F5E] dark:text-[#F5E6F0] truncate max-w-48">{product.name}</p>
-                        <p className="text-xs text-[#3B1F5E]/40 dark:text-[#F5E6F0]/40 truncate">{product.slug}</p>
+                        <p className="font-medium text-nav-purple dark:text-[#F5E6F0] truncate max-w-48">{product.name}</p>
+                        <p className="text-xs text-muted-foreground/70 dark:text-[#F5E6F0]/40 truncate">{product.slug}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-[#3B1F5E]/70 dark:text-[#F5E6F0]/70">{product.category.name}</td>
+                  <td className="px-6 py-4 text-muted-foreground dark:text-[#F5E6F0]/70">{product.category.name}</td>
                   <td className="px-6 py-4">
-                    <span className="text-[#3B1F5E]/70 dark:text-[#F5E6F0]/70">
+                    <span className="text-muted-foreground dark:text-[#F5E6F0]/70">
                       {activeVariants.length}{' '}
-                      <span className="text-[#3B1F5E]/40 dark:text-[#F5E6F0]/40 text-xs">({totalStock} en stock)</span>
+                      <span className="text-muted-foreground/70 dark:text-[#F5E6F0]/40 text-xs">({totalStock} en stock)</span>
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-semibold text-[#3B1F5E] dark:text-[#F5E6F0]">
+                  <td className="px-6 py-4 font-semibold text-nav-purple dark:text-[#F5E6F0]">
                     {minPrice !== null ? `$${Number(minPrice).toLocaleString('es-AR')}` : '—'}
                   </td>
                   <td className="px-6 py-4">
@@ -95,7 +95,7 @@ export function ProductsTable({ products, categories }: Props) {
                       <button
                         onClick={() => setSelected(product)}
                         aria-label="Ver producto"
-                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-[#3B1F5E]/40 dark:text-[#F5E6F0]/40 hover:bg-[#F9F5FB] dark:hover:bg-[#3D3845] hover:text-[#3B1F5E] dark:hover:text-[#F5E6F0] transition-colors"
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground/70 dark:text-[#F5E6F0]/40 hover:bg-muted dark:hover:bg-[#3D3845] hover:text-nav-purple dark:hover:text-[#F5E6F0] transition-colors"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -111,21 +111,21 @@ export function ProductsTable({ products, categories }: Props) {
       </div>
 
       {/* ── Mobile list ── */}
-      <div className="sm:hidden divide-y divide-[#6B1A2B]/6 dark:divide-dm-secondary/20">
+      <div className="sm:hidden divide-y divide-border dark:divide-dm-secondary/20">
         {products.map((product) => (
           <div key={product.id} className="flex items-center gap-3 px-4 py-3">
             {product.images[0] ? (
               <img
                 src={product.images[0].url}
                 alt={product.name}
-                className="h-10 w-10 rounded-lg object-cover border border-[#6B1A2B]/10 dark:border-dm-secondary/20 shrink-0"
+                className="h-10 w-10 rounded-lg object-cover border border-border dark:border-dm-secondary/20 shrink-0"
               />
             ) : (
-              <div className="h-10 w-10 rounded-lg bg-[#F9F5FB] dark:bg-[#3D3845] flex items-center justify-center shrink-0">
+              <div className="h-10 w-10 rounded-lg bg-muted dark:bg-[#3D3845] flex items-center justify-center shrink-0">
                 <Package className="h-4 w-4 text-[#A98EC5] dark:text-nav-burgundy" />
               </div>
             )}
-            <p className="font-medium text-[#3B1F5E] dark:text-[#F5E6F0] text-sm truncate flex-1">{product.name}</p>
+            <p className="font-medium text-nav-purple dark:text-[#F5E6F0] text-sm truncate flex-1">{product.name}</p>
             <div className="flex items-center gap-1 shrink-0">
               <EditProductDialog product={product} categories={categories} />
               <ProductDeleteButton productId={product.id} productName={product.name} />
@@ -141,15 +141,15 @@ export function ProductsTable({ products, categories }: Props) {
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative bg-white dark:bg-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="relative bg-card dark:bg-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#6B1A2B]/10 dark:border-dm-secondary/20">
-              <h2 className="font-serif font-bold text-lg text-[#3B1F5E] dark:text-[#F5E6F0]">Detalle del producto</h2>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border dark:border-dm-secondary/20">
+              <h2 className="font-serif font-bold text-lg text-nav-purple dark:text-[#F5E6F0]">Detalle del producto</h2>
               <button
                 onClick={() => setSelected(null)}
-                className="rounded-lg p-1.5 text-[#3B1F5E]/40 dark:text-[#F5E6F0]/40 hover:bg-[#F9F5FB] dark:hover:bg-[#3D3845] hover:text-[#3B1F5E] dark:hover:text-[#F5E6F0] transition-colors"
+                className="rounded-lg p-1.5 text-muted-foreground/70 dark:text-[#F5E6F0]/40 hover:bg-muted dark:hover:bg-[#3D3845] hover:text-nav-purple dark:hover:text-[#F5E6F0] transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -161,15 +161,15 @@ export function ProductsTable({ products, categories }: Props) {
                 <img
                   src={selected.images.find((i) => i.isPrimary)?.url ?? selected.images[0].url}
                   alt={selected.name}
-                  className="w-full h-48 object-cover rounded-xl border border-[#6B1A2B]/10 dark:border-dm-secondary/20"
+                  className="w-full h-48 object-cover rounded-xl border border-border dark:border-dm-secondary/20"
                 />
               )}
 
               {/* Name + badges */}
               <div>
-                <h3 className="font-serif font-bold text-xl text-[#3B1F5E] dark:text-[#F5E6F0]">{selected.name}</h3>
+                <h3 className="font-serif font-bold text-xl text-nav-purple dark:text-[#F5E6F0]">{selected.name}</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="flex items-center gap-1 rounded-full bg-[#F9F5FB] dark:bg-[#3D3845] px-2.5 py-0.5 text-xs text-[#A98EC5] dark:text-nav-burgundy">
+                  <span className="flex items-center gap-1 rounded-full bg-muted dark:bg-[#3D3845] px-2.5 py-0.5 text-xs text-[#A98EC5] dark:text-nav-burgundy">
                     <Tag className="h-3 w-3" /> {selected.category.name}
                   </span>
                   <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${selected.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
@@ -186,7 +186,7 @@ export function ProductsTable({ products, categories }: Props) {
 
               {/* Description */}
               {selected.description && (
-                <p className="text-sm text-[#3B1F5E]/60 dark:text-[#F5E6F0]/60 leading-relaxed">{selected.description}</p>
+                <p className="text-sm text-muted-foreground dark:text-[#F5E6F0]/60 leading-relaxed">{selected.description}</p>
               )}
 
               {/* Variants */}
@@ -199,10 +199,10 @@ export function ProductsTable({ products, categories }: Props) {
                     <div key={v.id} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <span className={`h-2 w-2 rounded-full ${v.isActive ? 'bg-green-500 dark:bg-green-400' : 'bg-red-400'}`} />
-                        <span className="text-[#3B1F5E] dark:text-[#F5E6F0]">{v.name}</span>
-                        <span className="text-xs text-[#3B1F5E]/40 dark:text-[#F5E6F0]/40">{v.stock} en stock</span>
+                        <span className="text-nav-purple dark:text-[#F5E6F0]">{v.name}</span>
+                        <span className="text-xs text-muted-foreground/70 dark:text-[#F5E6F0]/40">{v.stock} en stock</span>
                       </div>
-                      <span className="font-semibold text-[#3B1F5E] dark:text-[#F5E6F0]">
+                      <span className="font-semibold text-nav-purple dark:text-[#F5E6F0]">
                         ${Number(v.price).toLocaleString('es-AR')}
                       </span>
                     </div>
@@ -222,7 +222,7 @@ export function ProductsTable({ products, categories }: Props) {
                         key={img.id}
                         src={img.url}
                         alt={img.altText ?? selected.name}
-                        className={`h-16 w-16 rounded-lg object-cover border-2 ${img.isPrimary ? 'border-[#6B1A2B] dark:border-dm-secondary' : 'border-[#6B1A2B]/10 dark:border-dm-secondary/20'}`}
+                        className={`h-16 w-16 rounded-lg object-cover border-2 ${img.isPrimary ? 'border-brand-burgundy dark:border-dm-secondary' : 'border-border dark:border-dm-secondary/20'}`}
                       />
                     ))}
                   </div>
