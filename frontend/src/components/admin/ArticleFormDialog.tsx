@@ -2,9 +2,10 @@
 
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Pencil, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createPostAction, updatePostAction, type PostFormData } from '@/actions/posts';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 type Post = {
   id: string;
@@ -139,15 +140,17 @@ export function ArticleFormDialog({ post }: Props) {
                 <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={5} className={`${FIELD} resize-none`} placeholder="Contenido completo..." required />
               </div>
 
-              {/* Image URL */}
+              {/* Image */}
               <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                  <ImageIcon className="h-3.5 w-3.5" /> URL de imagen
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  Imagen
                 </label>
-                <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={FIELD} placeholder="https://..." type="url" />
-                {imageUrl && (
-                  <img src={imageUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg border border-border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                )}
+                <ImageUpload
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  folder="amyrose/posts"
+                  previewClassName="h-32 w-full"
+                />
               </div>
 
               {/* Published */}
