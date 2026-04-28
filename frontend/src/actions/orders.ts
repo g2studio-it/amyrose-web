@@ -3,6 +3,12 @@
 import { auth } from '@/auth';
 import { api, type ApiOrder, type PaginatedResult } from '@/lib/api';
 
+interface CartItemInput {
+  productId: string;
+  variantId: string;
+  quantity: number;
+}
+
 async function getToken(): Promise<string | undefined> {
   const session = await auth();
   return session?.user?.backendAccessToken;
@@ -29,10 +35,13 @@ export async function getOrderAction(id: string): Promise<ApiOrder | null> {
   }
 }
 
-export async function createOrderAction(notes?: string): Promise<ApiOrder> {
+export async function createOrderAction(
+  notes?: string,
+  items?: CartItemInput[],
+): Promise<ApiOrder> {
   const token = await getToken();
   if (!token) throw new Error('No autenticado');
-  return api.post<ApiOrder>('/orders', { notes }, token);
+  return api.post<ApiOrder>('/orders', { notes, items }, token);
 }
 
 export async function cancelOrderAction(id: string): Promise<ApiOrder> {

@@ -69,7 +69,10 @@ export function CheckoutModal({ items, totalPrice, onClose, onSuccess }: Props) 
       .join('. ');
 
     try {
-      const order = await createOrderAction(fullNotes);
+      const order = await createOrderAction(
+        fullNotes,
+        items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
+      );
       onSuccess(); // clear cart
 
       if (paymentMethod === 'mercadopago') {

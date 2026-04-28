@@ -13,6 +13,7 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { toast } from 'sonner';
 import {
   updateAdminProductAction,
@@ -135,11 +136,11 @@ function AddImageForm({ productId }: { productId: string }) {
       <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
         Agregar imagen
       </p>
-      <input
+      <ImageUpload
         value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="URL de la imagen (https://…)"
-        className={INPUT}
+        onChange={setUrl}
+        folder="amyrose/products"
+        previewClassName="h-28 w-full"
       />
       <div className="flex gap-2">
         <input

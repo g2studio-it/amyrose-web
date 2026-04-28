@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Plus, X, Trash2, PackagePlus, ChevronDown, ImageIcon, Star } from 'lucide-react';
+import { Plus, X, Trash2, PackagePlus, ChevronDown, Star, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { createAdminProductAction, addProductImageAction } from '@/actions/admin';
 import type { ApiCategory } from '@/lib/api';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -68,6 +69,7 @@ export function CreateProductDialog({ categories }: Props) {
   const [images, setImages] = useState<ImageRow[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageAlt, setNewImageAlt] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -75,7 +77,7 @@ export function CreateProductDialog({ categories }: Props) {
     setName(''); setSlug(''); setSlugManual(false);
     setDescription(''); setCategoryId(''); setIsFeatured(false);
     setVariants([{ ...EMPTY_VARIANT }]);
-    setImages([]); setNewImageUrl(''); setNewImageAlt('');
+    setImages([]); setNewImageUrl(''); setNewImageAlt(''); setUploadingImage(false);
   }
 
   function handleClose() { setOpen(false); reset(); }
@@ -428,13 +430,11 @@ export function CreateProductDialog({ categories }: Props) {
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
                       Agregar imagen
                     </p>
-                    <input
-                      type="url"
+                    <ImageUpload
                       value={newImageUrl}
-                      onChange={(e) => setNewImageUrl(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImage(); } }}
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      className={INPUT}
+                      onChange={(url) => { setNewImageUrl(url); setUploadingImage(false); }}
+                      folder="amyrose/products"
+                      previewClassName="h-28 w-full"
                     />
                     <div className="flex gap-2">
                       <input
@@ -447,7 +447,7 @@ export function CreateProductDialog({ categories }: Props) {
                       <button
                         type="button"
                         onClick={addImage}
-                        disabled={!newImageUrl.trim()}
+                        disabled={!newImageUrl.trim() || uploadingImage}
                         className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-2 text-xs font-medium text-brand-burgundy transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         <Plus className="h-3.5 w-3.5" />

@@ -36,16 +36,28 @@ export class OrdersService {
   async createFromCart(userId: string, dto: CreateOrderDto): Promise<Order> {
     this.logger.log(`Creating order for user ${userId}`);
 
-    const cart = await this.cartService.getCart(userId);
-    if (!cart.items?.length) {
-      throw new BadRequestException('El carrito está vacío');
+    // Use items from the request body if provided; otherwise fall back to the backend cart
+    let rawItems: Array<{ productId: string; variantId: string; quantity: number }>;
+
+    if (dto.items?.length) {
+      rawItems = dto.items;
+    } else {
+      const cart = await this.cartService.getCart(userId);
+      if (!cart.items?.length) {
+        throw new BadRequestException('El carrito está vacío');
+      }
+      rawItems = cart.items.map((i) => ({
+        productId: i.productId,
+        variantId: i.variantId,
+        quantity: i.quantity,
+      }));
     }
 
     // Build order items and calculate totals
     const orderItems: Partial<OrderItem>[] = [];
     let subtotal = 0;
 
-    for (const item of cart.items) {
+    for (const item of rawItems) {
       const product = await this.catalogService.findProductById(item.productId);
       const variant = product.variants.find((v) => v.id === item.variantId);
 

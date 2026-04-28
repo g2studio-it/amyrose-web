@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
     const { orderId, locale = 'es' } = await req.json();
 
-    const order = await prisma.order.findUnique({
+    const order = await prisma.order.findFirst({
       where: { id: orderId, userId: session.user.id },
       include: { items: true },
     });
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     const preference = await preferenceClient.create({
       body: {
-        items: order.items.map((item) => ({
+        items: order.items.map((item: { variantId: string; productName: string; variantName: string; quantity: number; unitPrice: number | { toNumber(): number } }) => ({
           id: item.variantId,
           title: `${item.productName} — ${item.variantName}`,
           quantity: item.quantity,
