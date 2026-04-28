@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
     const ordersUrl = `${appUrl}/${locale}/orders`;
+    const isLocalhost = appUrl.includes('localhost') || appUrl.includes('127.0.0.1');
 
     const preference = await preferenceClient.create({
       body: {
@@ -38,9 +39,9 @@ export async function POST(req: NextRequest) {
           failure: `${ordersUrl}?payment=failure&orderId=${orderId}`,
           pending: `${ordersUrl}?payment=pending&orderId=${orderId}`,
         },
-        auto_return: 'approved',
+        ...(isLocalhost ? {} : { auto_return: 'approved' }),
         external_reference: orderId,
-        notification_url: `${appUrl}/api/payments/webhook`,
+        ...(!isLocalhost ? { notification_url: `${appUrl}/api/payments/webhook` } : {}),
       },
     });
 

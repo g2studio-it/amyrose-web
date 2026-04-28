@@ -3,10 +3,18 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { getOrdersAction } from '@/actions/orders';
+import { prisma } from '@/lib/prisma';
+import { paymentClient } from '@/lib/mercadopago';
 
 interface Props {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ payment?: string; orderId?: string }>;
+  searchParams: Promise<{
+    payment?: string;
+    orderId?: string;
+    collection_id?: string;
+    payment_id?: string;
+    external_reference?: string;
+  }>;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -16,6 +24,20 @@ const STATUS_COLORS: Record<string, string> = {
   READY: 'bg-green-100 text-green-800',
   DELIVERED: 'bg-gray-100 text-gray-700',
   CANCELLED: 'bg-red-100 text-red-800',
+};
+
+const PAYMENT_STATUS_COLORS: Record<string, string> = {
+  PENDING: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+  APPROVED: 'bg-green-50 text-green-700 border border-green-200',
+  REJECTED: 'bg-red-50 text-red-700 border border-red-200',
+  REFUNDED: 'bg-gray-50 text-gray-600 border border-gray-200',
+};
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: 'Pago pendiente',
+  APPROVED: 'Pago aprobado',
+  REJECTED: 'Pago rechazado',
+  REFUNDED: 'Reembolsado',
 };
 
 const PAYMENT_BANNERS = {
@@ -39,11 +61,55 @@ const PAYMENT_BANNERS = {
   },
 } as const;
 
+async function verifyMercadoPagoReturn(
+  collectionId: string,
+  userId: string,
+): Promise<void> {
+  try {
+    const mpPayment = await paymentClient.get({ id: Number(collectionId) });
+    const orderId = mpPayment.external_reference;
+    if (!orderId) return;
+
+    const order = await prisma.order.findFirst({ where: { id: orderId, userId } });
+    if (!order) return;
+
+    const paymentStatusMap: Record<string, 'PENDING' | 'APPROVED' | 'REJECTED'> = {
+      approved: 'APPROVED',
+      rejected: 'REJECTED',
+      pending: 'PENDING',
+      in_process: 'PENDING',
+      cancelled: 'REJECTED',
+      refunded: 'REJECTED',
+      charged_back: 'REJECTED',
+    };
+
+    const paymentStatus = paymentStatusMap[mpPayment.status ?? ''] ?? 'PENDING';
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        mpPaymentId: collectionId,
+        paymentStatus,
+        ...(paymentStatus === 'APPROVED' ? { status: 'CONFIRMED' } : {}),
+      },
+    });
+  } catch {
+    // Non-critical — webhook is the authoritative update mechanism
+  }
+}
+
 export default async function OrdersPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { payment } = await searchParams;
+  const { payment, collection_id, payment_id } = await searchParams;
   const session = await auth();
   if (!session?.user) redirect(`/${locale}/login`);
+
+  // On return from MercadoPago, verify payment and update order status immediately.
+  // This is a fallback for local dev where the webhook can't reach localhost.
+  const mpPaymentId = collection_id ?? payment_id;
+  if (payment === 'success' && mpPaymentId && session.user.id) {
+    await verifyMercadoPagoReturn(mpPaymentId, session.user.id);
+  }
 
   const t = await getTranslations('orders');
   const orders = await getOrdersAction();
@@ -102,13 +168,20 @@ export default async function OrdersPage({ params, searchParams }: Props) {
                 </div>
 
                 {/* Status */}
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-end sm:items-center gap-1.5">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       STATUS_COLORS[order.status] ?? 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {t(`status.${order.status}` as Parameters<typeof t>[0])}
+                  </span>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      PAYMENT_STATUS_COLORS[order.paymentStatus] ?? 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {PAYMENT_STATUS_LABELS[order.paymentStatus] ?? order.paymentStatus}
                   </span>
                 </div>
 
