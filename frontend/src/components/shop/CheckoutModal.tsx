@@ -37,12 +37,13 @@ const METHODS: {
   icon: React.ElementType | typeof MercadoPagoIcon;
   label: string;
   description: string;
+  disabled?: boolean;
 }[] = [
   {
-    id: 'mercadopago',
-    icon: MercadoPagoIcon,
-    label: 'MercadoPago',
-    description: 'Tarjeta, débito, crédito o efectivo en puntos de pago',
+    id: 'cash',
+    icon: CashIcon,
+    label: 'Efectivo',
+    description: 'Abonás al momento de retirar o recibir tu pedido',
   },
   {
     id: 'transfer',
@@ -51,10 +52,11 @@ const METHODS: {
     description: 'Transferí el monto y envianos el comprobante',
   },
   {
-    id: 'cash',
-    icon: CashIcon,
-    label: 'Efectivo',
-    description: 'Abonás al momento de retirar o recibir tu pedido',
+    id: 'mercadopago',
+    icon: MercadoPagoIcon,
+    label: 'MercadoPago',
+    description: 'Tarjeta, débito, crédito o efectivo en puntos de pago',
+    disabled: true,
   },
 ];
 
@@ -103,38 +105,17 @@ export function CheckoutModal({
         }))
       );
       onSuccess(); // clear cart
+      onClose();
 
-      if (paymentMethod === 'mercadopago') {
-        const res = await fetch('/api/payments/create-preference', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId: order.id, locale }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.initPoint) {
-          throw new Error(
-            data.error ?? 'No se pudo iniciar el pago con MercadoPago'
-          );
-        }
-        window.location.href = data.initPoint;
+      if (paymentMethod === 'cash') {
+        router.push(`/${locale}/orders/success?orderId=${order.id}`);
         return;
       }
 
-      onClose();
-
       if (paymentMethod === 'transfer') {
-        toast.success(
-          `Pedido #${order.id.slice(0, 8).toUpperCase()} creado. Realizá la transferencia y envianos el comprobante.`,
-          { duration: 7000 }
-        );
-      } else {
-        toast.success(
-          `Pedido #${order.id.slice(0, 8).toUpperCase()} creado. Abonás en efectivo al retirar.`,
-          { duration: 6000 }
-        );
+        router.push(`/${locale}/orders/transfer?orderId=${order.id}`);
+        return;
       }
-
-      router.push(`/${locale}/orders`);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'Error al procesar el pedido'
@@ -235,23 +216,33 @@ export function CheckoutModal({
               Método de pago <span className="text-brand-burgundy">*</span>
             </p>
             <div className="space-y-2">
-              {METHODS.map(({ id, icon: Icon, label, description }) => {
+              {METHODS.map(({ id, icon: Icon, label, description, disabled }) => {
                 const selected = paymentMethod === id;
                 return (
                   <button
                     key={id}
                     type="button"
-                    onClick={() => setPaymentMethod(id)}
-                    className={`flex w-full items-center gap-3.5 rounded-xl border-2 px-4 py-3.5 text-left transition-all ${
-                      selected
-                        ? 'border-brand-burgundy bg-brand-burgundy/5 dark:bg-brand-burgundy/10'
-                        : 'border-border dark:bg-dm-secondary/30 hover:border-brand-burgundy/30 dark:hover:border-brand-burgundy/20 bg-gray-50'
+                    onClick={() => !disabled && setPaymentMethod(id)}
+                    disabled={disabled}
+                    className={`relative flex w-full items-center gap-3.5 rounded-xl border-2 px-4 py-3.5 text-left transition-all ${
+                      disabled
+                        ? 'cursor-not-allowed border-border bg-gray-50/40 opacity-50 dark:bg-dm-secondary/10'
+                        : selected
+                          ? 'border-brand-burgundy bg-brand-burgundy/5 dark:bg-brand-burgundy/10'
+                          : 'border-border bg-gray-50 hover:border-brand-burgundy/30 dark:bg-dm-secondary/30 dark:hover:border-brand-burgundy/20'
                     }`}
                   >
+                    {/* Disabled badge */}
+                    {disabled && (
+                      <span className="absolute top-2 right-3 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                        pronto ⚙️
+                      </span>
+                    )}
+
                     {/* Icon */}
                     <div
                       className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                        selected
+                        selected && !disabled
                           ? 'bg-brand-burgundy text-white'
                           : 'bg-gray-100 text-gray-400'
                       }`}
@@ -262,7 +253,7 @@ export function CheckoutModal({
                     {/* Text */}
                     <div className="min-w-0 flex-1">
                       <p
-                        className={`text-sm font-semibold ${selected ? 'text-brand-burgundy' : 'text-nav-purple dark:text-white'}`}
+                        className={`text-sm font-semibold ${selected && !disabled ? 'text-brand-burgundy' : 'text-nav-purple dark:text-white'}`}
                       >
                         {label}
                       </p>
@@ -271,18 +262,20 @@ export function CheckoutModal({
                       </p>
                     </div>
 
-                    {/* Radio dot */}
-                    <div
-                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                        selected
-                          ? 'border-brand-burgundy bg-brand-burgundy'
-                          : 'border-gray-300'
-                      }`}
-                    >
-                      {selected && (
-                        <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                      )}
-                    </div>
+                    {/* Radio dot (hidden for disabled) */}
+                    {!disabled && (
+                      <div
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                          selected
+                            ? 'border-brand-burgundy bg-brand-burgundy'
+                            : 'border-gray-300'
+                        }`}
+                      >
+                        {selected && (
+                          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                    )}
                   </button>
                 );
               })}
@@ -324,16 +317,6 @@ export function CheckoutModal({
             </div>
           )}
 
-          {paymentMethod === 'mercadopago' && (
-            <div className="rounded-xl border border-sky-100 bg-sky-50 p-4 text-xs text-sky-800">
-              <p className="font-semibold">Pago con MercadoPago</p>
-              <p className="mt-1">
-                Serás redirigido a MercadoPago para completar el pago de forma
-                segura con tarjeta, débito, crédito o efectivo en puntos
-                habilitados.
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Footer */}
