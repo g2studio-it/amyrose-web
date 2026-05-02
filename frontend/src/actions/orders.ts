@@ -2,6 +2,7 @@
 
 import { auth } from '@/auth';
 import { api, type ApiOrder, type PaginatedResult } from '@/lib/api';
+import { prisma } from '@/lib/prisma';
 
 interface CartItemInput {
   productId: string;
@@ -48,4 +49,22 @@ export async function cancelOrderAction(id: string): Promise<ApiOrder> {
   const token = await getToken();
   if (!token) throw new Error('No autenticado');
   return api.patch<ApiOrder>(`/orders/${id}/cancel`, {}, token);
+}
+
+export async function attachProofAction(orderId: string, proofUrl: string): Promise<void> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error('No autenticado');
+
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId: session.user.id },
+    select: { notes: true },
+  });
+  if (!order) throw new Error('Pedido no encontrado');
+
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      notes: [order.notes, `Comprobante: ${proofUrl}`].filter(Boolean).join('\n'),
+    },
+  });
 }
