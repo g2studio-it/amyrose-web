@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { Eye } from 'lucide-react';
 import { auth } from '@/auth';
 import { getOrdersAction } from '@/actions/orders';
 import { prisma } from '@/lib/prisma';
@@ -162,7 +163,7 @@ export default async function OrdersPage({ params, searchParams }: Props) {
                   </p>
                   {order.notes && (
                     <p className="text-xs text-muted-foreground mt-1 italic">
-                      {order.notes}
+                      {order.notes.split('\n')[0]}
                     </p>
                   )}
                 </div>
@@ -192,6 +193,15 @@ export default async function OrdersPage({ params, searchParams }: Props) {
                     ${Number(order.total).toLocaleString('es-AR')}
                   </p>
                 </div>
+
+                {/* View detail */}
+                <Link
+                  href={`/${locale}/orders/success?orderId=${order.id}`}
+                  className="shrink-0 flex items-center justify-center h-9 w-9 rounded-xl border border-border text-muted-foreground transition-colors hover:border-brand-burgundy/40 hover:text-brand-burgundy hover:bg-brand-burgundy/5"
+                  title="Ver detalle"
+                >
+                  <Eye className="h-4 w-4" />
+                </Link>
               </div>
             ))}
           </div>
