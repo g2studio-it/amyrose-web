@@ -129,6 +129,11 @@ export function CreateProductDialog({ categories }: Props) {
       toast.error('Completá nombre y precio en todas las variantes'); return;
     }
 
+    // Auto-include any uploaded image that wasn't manually added via "Agregar"
+    const imagesToSave: ImageRow[] = newImageUrl.trim()
+      ? [...images, { url: newImageUrl.trim(), altText: newImageAlt.trim(), isPrimary: images.length === 0 }]
+      : images;
+
     startTransition(async () => {
       // 1. Create product
       const result = await createAdminProductAction({
@@ -146,8 +151,8 @@ export function CreateProductDialog({ categories }: Props) {
       if (result.error) { toast.error(result.error); return; }
 
       // 2. Add images sequentially
-      if (result.productId && images.length > 0) {
-        for (const img of images) {
+      if (result.productId && imagesToSave.length > 0) {
+        for (const img of imagesToSave) {
           const imgResult = await addProductImageAction(result.productId, {
             url: img.url,
             altText: img.altText || undefined,
