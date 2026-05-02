@@ -81,7 +81,7 @@ export class Order {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ default: () => 'NOW()' })
   updatedAt!: Date;
 
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })

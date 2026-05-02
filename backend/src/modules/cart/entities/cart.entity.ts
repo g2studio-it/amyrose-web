@@ -30,5 +30,6 @@ export class Cart {
   @BeforeInsert()
   generateId(): void {
     if (!this.id) this.id = uuidv4();
+    this.updatedAt = new Date();
   }
 }
