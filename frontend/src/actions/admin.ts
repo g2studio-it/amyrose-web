@@ -111,17 +111,39 @@ export async function createAdminCategoryAction(data: {
   }
 }
 
+function generateSlug(name: string): string {
+  const base = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join('-')
+    .slice(0, 20);
+  const suffix = Math.random().toString(36).slice(2, 7);
+  return `${base}-${suffix}`;
+}
+
+function generateSku(): string {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
 export async function createAdminProductAction(data: {
   categoryId: string;
   name: string;
-  slug: string;
   description?: string;
   isFeatured?: boolean;
-  variants: { name: string; price: number; stock?: number; sku?: string }[];
+  variants: { name: string; price: number; stock?: number }[];
 }): Promise<{ error?: string; productId?: string }> {
   try {
     const token = await getAdminToken();
-    const product = await api.post<ApiProduct>('/catalog/products', data, token);
+    const product = await api.post<ApiProduct>('/catalog/products', {
+      ...data,
+      slug: generateSlug(data.name),
+      variants: data.variants.map((v) => ({ ...v, sku: generateSku() })),
+    }, token);
     revalidatePath('/[locale]/admin/products', 'page');
     return { productId: product.id };
   } catch (e) {
@@ -157,9 +179,32 @@ export async function addProductImageAction(
   data: { url: string; altText?: string; isPrimary?: boolean },
 ): Promise<{ error?: string }> {
   try {
-    const token = await getAdminToken();
-    await api.post(`/catalog/products/${productId}/images`, data, token);
+    // Validate admin session
+    const session = await auth();
+    if (!session?.user || session.user.role !== 'ADMIN') throw new Error('No autorizado');
+
+    // If this image should be primary, unset any existing primary first
+    if (data.isPrimary) {
+      await prisma.productImage.updateMany({
+        where: { productId },
+        data: { isPrimary: false },
+      });
+    }
+
+    const count = await prisma.productImage.count({ where: { productId } });
+
+    await prisma.productImage.create({
+      data: {
+        productId,
+        url: data.url,
+        altText: data.altText ?? null,
+        isPrimary: data.isPrimary ?? count === 0,
+        sortOrder: count,
+      },
+    });
+
     revalidatePath('/[locale]/admin/products', 'page');
+    revalidatePath('/', 'layout');
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al agregar imagen' };
@@ -172,9 +217,16 @@ export async function updateProductImageAction(
   data: { altText?: string; isPrimary?: boolean },
 ): Promise<{ error?: string }> {
   try {
-    const token = await getAdminToken();
-    await api.patch(`/catalog/products/${productId}/images/${imageId}`, data, token);
+    const session = await auth();
+    if (!session?.user || session.user.role !== 'ADMIN') throw new Error('No autorizado');
+
+    if (data.isPrimary) {
+      await prisma.productImage.updateMany({ where: { productId }, data: { isPrimary: false } });
+    }
+
+    await prisma.productImage.update({ where: { id: imageId }, data });
     revalidatePath('/[locale]/admin/products', 'page');
+    revalidatePath('/', 'layout');
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al actualizar imagen' };
@@ -186,9 +238,12 @@ export async function deleteProductImageAction(
   imageId: string,
 ): Promise<{ error?: string }> {
   try {
-    const token = await getAdminToken();
-    await api.delete(`/catalog/products/${productId}/images/${imageId}`, token);
+    const session = await auth();
+    if (!session?.user || session.user.role !== 'ADMIN') throw new Error('No autorizado');
+
+    await prisma.productImage.delete({ where: { id: imageId } });
     revalidatePath('/[locale]/admin/products', 'page');
+    revalidatePath('/', 'layout');
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al eliminar imagen' };
