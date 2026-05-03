@@ -270,30 +270,34 @@ export function Header() {
                           Mi perfil
                         </Link>
 
-                        <Link
-                          href={`/${locale}/orders`}
-                          role="menuitem"
-                          className={menuItemClass}
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <ClipboardList className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                          Mis pedidos
-                        </Link>
+                        {!isAdmin && (
+                          <>
+                            <Link
+                              href={`/${locale}/orders`}
+                              role="menuitem"
+                              className={menuItemClass}
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              <ClipboardList className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                              Mis pedidos
+                            </Link>
 
-                        <Link
-                          href={`/${locale}/cart`}
-                          role="menuitem"
-                          className={menuItemClass}
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <ShoppingCart className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                          Mi carrito
-                          {totalItems > 0 && (
-                            <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[#6B1A2B] px-1 text-[10px] font-bold text-white">
-                              {totalItems}
-                            </span>
-                          )}
-                        </Link>
+                            <Link
+                              href={`/${locale}/cart`}
+                              role="menuitem"
+                              className={menuItemClass}
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              <ShoppingCart className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                              Mi carrito
+                              {totalItems > 0 && (
+                                <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[#6B1A2B] px-1 text-[10px] font-bold text-white">
+                                  {totalItems}
+                                </span>
+                              )}
+                            </Link>
+                          </>
+                        )}
 
                         {isAdmin && (
                           <>
@@ -451,27 +455,31 @@ export function Header() {
                 <User className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
                 Mi perfil
               </Link>
-              <Link
-                href={`/${locale}/orders`}
-                className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <ClipboardList className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
-                Mis pedidos
-              </Link>
-              <Link
-                href={`/${locale}/cart`}
-                className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <ShoppingCart className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
-                Mi carrito
-                {totalItems > 0 && (
-                  <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[#6B1A2B] px-1 text-[10px] font-bold text-white">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
+              {!isAdmin && (
+                <>
+                  <Link
+                    href={`/${locale}/orders`}
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <ClipboardList className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
+                    Mis pedidos
+                  </Link>
+                  <Link
+                    href={`/${locale}/cart`}
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <ShoppingCart className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
+                    Mi carrito
+                    {totalItems > 0 && (
+                      <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[#6B1A2B] px-1 text-[10px] font-bold text-white">
+                        {totalItems}
+                      </span>
+                    )}
+                  </Link>
+                </>
+              )}
               {isAdmin && (
                 <Link
                   href={`/${locale}/admin/dashboard`}
