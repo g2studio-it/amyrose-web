@@ -1,52 +1,25 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ExternalLink, Instagram, Facebook, Youtube, Linkedin, Twitter, Link2 } from 'lucide-react';
+import { Instagram } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
+import { ContactForm } from '@/components/shop/ContactForm';
 
 interface Props {
   params: Promise<{ locale: string }>;
 }
 
-const PLATFORM_ICONS: Record<string, React.ElementType> = {
-  instagram: Instagram,
-  facebook:  Facebook,
-  youtube:   Youtube,
-  linkedin:  Linkedin,
-  twitter:   Twitter,
-  tiktok:    Link2,
-  whatsapp:  Link2,
-  other:     ExternalLink,
-};
-
-const PLATFORM_COLORS: Record<string, string> = {
-  instagram: 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400',
-  facebook:  'bg-blue-600',
-  youtube:   'bg-red-600',
-  linkedin:  'bg-blue-700',
-  twitter:   'bg-slate-800',
-  tiktok:    'bg-slate-900',
-  whatsapp:  'bg-green-500',
-  other:     'bg-[#6B1A2B]',
-};
-
 export default async function AboutPage({ params }: Props) {
   const { locale } = await params;
 
-  const [articles, socialLinks] = await Promise.all([
-    prisma.post
-      .findMany({ where: { isPublished: true }, orderBy: { publishedAt: 'desc' } })
-      .catch(() => []),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ((prisma as any).socialLink as typeof prisma.socialLink | undefined)
-      ?.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: 'asc' }, { platform: 'asc' }] })
-      .catch(() => []) ?? Promise.resolve([]),
-  ]);
+  const articles = await prisma.post
+    .findMany({ where: { isPublished: true }, orderBy: { publishedAt: 'desc' } })
+    .catch(() => []);
 
   return (
     <div className="min-h-screen bg-background">
 
       {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-linear-to-br from-nav-purple via-nav-burgundy to-[#8B3A52] text-white py-24 px-4">
+      <section className="relative overflow-hidden bg-linear-to-br from-[#3B1F5E] via-[#6B1A2B] to-[#8B3A52] text-white py-24 px-4">
         <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/5" />
         <div className="absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-white/5" />
         <div className="relative container mx-auto max-w-3xl text-center">
@@ -56,7 +29,7 @@ export default async function AboutPage({ params }: Props) {
           <h1 className="font-serif font-extrabold text-5xl md:text-6xl mb-6 leading-tight">
             Hola, soy <span className="italic">Angeles</span>
           </h1>
-          <p className="text-nav-lilac-divider text-lg md:text-xl leading-relaxed max-w-xl mx-auto">
+          <p className="text-white/75 text-lg md:text-xl leading-relaxed max-w-xl mx-auto">
             Pastelera apasionada, creadora de momentos dulces y artista del azúcar.
             Bienvenida a Amy Rose Bakery, mi lugar en el mundo.
           </p>
@@ -69,7 +42,7 @@ export default async function AboutPage({ params }: Props) {
           <div className="relative">
             <div className="relative h-[420px] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=700&q=80"
+                src="/myhistori.png"
                 alt="Angeles pastelera"
                 fill
                 className="object-cover"
@@ -187,45 +160,39 @@ export default async function AboutPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── Social networks ───────────────────────────────────── */}
-      {socialLinks.length > 0 && (
-        <section className="bg-[#F9F5FB] dark:bg-[#322E37] py-16 px-4">
-          <div className="container mx-auto max-w-3xl text-center">
-            <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] dark:text-nav-burgundy mb-2">
-              Seguime en
+      {/* ── Contact ───────────────────────────────────────────── */}
+      <section className="bg-[#F9F5FB] dark:bg-[#322E37] py-20 px-4">
+        <div className="container mx-auto max-w-2xl">
+          <div className="text-center mb-10">
+            <p className="font-serif text-xs uppercase tracking-[0.25em] text-[#A98EC5] dark:text-nav-burgundy mb-2">Escribime</p>
+            <h2 className="font-serif font-bold text-3xl text-nav-purple dark:text-[#F5E6F0]">Contacto</h2>
+            <p className="mt-3 text-sm text-nav-purple/65 dark:text-[#F5E6F0]/60 max-w-md mx-auto">
+              ¿Tenés una consulta o querés hacer un pedido personalizado? Completá el formulario y te respondo a la brevedad.
             </p>
-            <h2 className="font-serif font-bold text-3xl text-nav-purple mb-10">
-              Redes sociales
-            </h2>
-            <div className="flex flex-wrap justify-center gap-4">
-              {socialLinks.map((link: { id: string; platform: string; label: string; url: string }) => {
-                const Icon = PLATFORM_ICONS[link.platform] ?? Link2;
-                const colorClass = PLATFORM_COLORS[link.platform] ?? 'bg-[#6B1A2B]';
-                return (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-3 rounded-2xl border border-nav-lilac-divider dark:border-dm-secondary/40 bg-white dark:bg-card px-5 py-3.5 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${colorClass} text-white shrink-0`}>
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span className="font-medium text-nav-purple text-sm">{link.label}</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-nav-purple/30 group-hover:text-nav-purple/60 transition-colors" />
-                  </a>
-                );
-              })}
-            </div>
           </div>
-        </section>
-      )}
+          <div className="bg-white dark:bg-card rounded-2xl border border-nav-lilac-divider dark:border-dm-secondary/30 shadow-sm p-6 md:p-8">
+            <ContactForm />
+          </div>
+          <div className="mt-8 flex justify-center">
+            <a
+              href="https://www.instagram.com/amyrose.pasteleria"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-3 rounded-2xl border border-nav-lilac-divider dark:border-dm-secondary/40 bg-white dark:bg-card px-5 py-3.5 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+            >
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-purple-500 via-pink-500 to-orange-400 text-white shrink-0">
+                <Instagram className="h-4 w-4" />
+              </span>
+              <span className="font-medium text-nav-purple dark:text-[#F5E6F0] text-sm">Seguime en Instagram</span>
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* ── CTA ───────────────────────────────────────────────── */}
-      <section className="bg-linear-to-r from-nav-burgundy to-nav-purple py-16 text-center text-white px-4">
+      <section className="bg-linear-to-r from-[#6B1A2B] to-[#3B1F5E] py-16 text-center text-white px-4">
         <h2 className="font-serif font-bold text-3xl mb-4">¿Querés hacer un pedido?</h2>
-        <p className="text-nav-lilac-divider mb-8 max-w-md mx-auto">
+        <p className="text-white/75 mb-8 max-w-md mx-auto">
           Explorá el catálogo o contactame directamente para hablar de tu pedido personalizado.
         </p>
         <Link
