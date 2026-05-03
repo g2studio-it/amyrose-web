@@ -13,7 +13,6 @@ interface Variant {
   name: string;
   price: string;
   stock: string;
-  sku: string;
 }
 
 interface ImageRow {
@@ -22,20 +21,10 @@ interface ImageRow {
   isPrimary: boolean;
 }
 
-const EMPTY_VARIANT: Variant = { name: '', price: '', stock: '', sku: '' };
+const EMPTY_VARIANT: Variant = { name: '', price: '', stock: '' };
 const EMPTY_IMAGE: ImageRow = { url: '', altText: '', isPrimary: false };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
-}
 
 const INPUT =
   'w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none focus:ring-2 focus:ring-brand-burgundy/10';
@@ -56,8 +45,6 @@ export function CreateProductDialog({ categories }: Props) {
 
   // Basic info
   const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [slugManual, setSlugManual] = useState(false);
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
@@ -74,18 +61,12 @@ export function CreateProductDialog({ categories }: Props) {
   // ── Helpers ──────────────────────────────────────────────────────────────
 
   function reset() {
-    setName(''); setSlug(''); setSlugManual(false);
-    setDescription(''); setCategoryId(''); setIsFeatured(false);
+    setName(''); setDescription(''); setCategoryId(''); setIsFeatured(false);
     setVariants([{ ...EMPTY_VARIANT }]);
     setImages([]); setNewImageUrl(''); setNewImageAlt(''); setUploadingImage(false);
   }
 
   function handleClose() { setOpen(false); reset(); }
-
-  function handleNameChange(val: string) {
-    setName(val);
-    if (!slugManual) setSlug(slugify(val));
-  }
 
   // ── Variant helpers ───────────────────────────────────────────────────────
 
@@ -137,20 +118,20 @@ export function CreateProductDialog({ categories }: Props) {
     startTransition(async () => {
       // 1. Create product
       const result = await createAdminProductAction({
-        categoryId, name, slug,
+        categoryId, name,
         description: description || undefined,
         isFeatured,
         variants: variants.map((v) => ({
           name: v.name,
           price: parseFloat(v.price),
           stock: v.stock ? parseInt(v.stock) : undefined,
-          sku: v.sku || undefined,
         })),
       });
 
       if (result.error) { toast.error(result.error); return; }
 
       // 2. Add images sequentially
+      let imageError = false;
       if (result.productId && imagesToSave.length > 0) {
         for (const img of imagesToSave) {
           const imgResult = await addProductImageAction(result.productId, {
@@ -159,12 +140,13 @@ export function CreateProductDialog({ categories }: Props) {
             isPrimary: img.isPrimary,
           });
           if (imgResult.error) {
-            toast.warning(`Producto creado, pero error al subir imagen: ${imgResult.error}`);
+            toast.error(`Producto creado pero la imagen no se guardó: ${imgResult.error}`);
+            imageError = true;
           }
         }
       }
 
-      toast.success(`"${name}" creado correctamente`);
+      toast.success(imageError ? `"${name}" creado (revisá las imágenes)` : `"${name}" creado correctamente`);
       handleClose();
     });
   }
@@ -218,20 +200,9 @@ export function CreateProductDialog({ categories }: Props) {
                     <input
                       required
                       value={name}
-                      onChange={(e) => handleNameChange(e.target.value)}
+                      onChange={(e) => setName(e.target.value)}
                       placeholder="Ej: Torta de chocolate"
                       className={INPUT}
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className={LABEL}>Slug <span className="text-brand-burgundy">*</span></label>
-                    <input
-                      required
-                      value={slug}
-                      onChange={(e) => { setSlugManual(true); setSlug(e.target.value); }}
-                      placeholder="torta-de-chocolate"
-                      className={`${INPUT} font-mono text-xs`}
                     />
                   </div>
 
@@ -338,15 +309,6 @@ export function CreateProductDialog({ categories }: Props) {
                               value={variant.stock}
                               onChange={(e) => updateVariant(index, 'stock', e.target.value)}
                               placeholder="0"
-                              className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none"
-                            />
-                          </div>
-                          <div className="col-span-2 space-y-1">
-                            <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">SKU</label>
-                            <input
-                              value={variant.sku}
-                              onChange={(e) => updateVariant(index, 'sku', e.target.value)}
-                              placeholder="Opcional"
                               className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none"
                             />
                           </div>
