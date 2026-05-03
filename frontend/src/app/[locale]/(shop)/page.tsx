@@ -59,17 +59,17 @@ export default async function HomePage({ params }: Props) {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-nav-purple/90 via-nav-burgundy/75 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#3B1F5E]/90 via-[#6B1A2B]/75 to-transparent" />
         </div>
 
         <div className="relative container mx-auto px-6 py-24 max-w-2xl">
-          <p className="font-serif text-nav-lilac-divider text-sm uppercase tracking-[0.3em] mb-4">
+          <p className="font-serif text-white/60 text-sm uppercase tracking-[0.3em] mb-4">
             Repostería artesanal
           </p>
           <h1 className="font-serif font-extrabold text-5xl md:text-6xl text-white leading-tight mb-5">
             {t('hero.title')}
           </h1>
-          <p className="text-nav-lilac-divider text-lg md:text-xl mb-10 leading-relaxed">
+          <p className="text-white/75 text-lg md:text-xl mb-10 leading-relaxed">
             {t('hero.subtitle')}
           </p>
           <div className="flex flex-wrap gap-4">
@@ -115,7 +115,7 @@ export default async function HomePage({ params }: Props) {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-nav-purple/80 via-nav-purple/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#3B1F5E]/80 via-[#3B1F5E]/30 to-transparent" />
                 <span className="absolute top-4 left-4 text-3xl">{cat.emoji}</span>
                 <h3 className="absolute bottom-4 left-4 font-serif font-bold text-xl text-white">
                   {cat.label}
@@ -234,14 +234,14 @@ export default async function HomePage({ params }: Props) {
       )}
 
       {/* ── CTA banner ────────────────────────────────────────────── */}
-      <section className="bg-linear-to-r from-nav-burgundy to-nav-purple py-16 text-center text-white">
-        <p className="font-serif text-xs uppercase tracking-[0.3em] text-nav-lilac-divider mb-3">
+      <section className="bg-linear-to-r from-[#6B1A2B] to-[#3B1F5E] py-16 text-center text-white">
+        <p className="font-serif text-xs uppercase tracking-[0.3em] text-white/60 mb-3">
           Pedidos personalizados
         </p>
         <h2 className="font-serif font-bold text-3xl mb-4">
           ¿Tenés algo especial en mente?
         </h2>
-        <p className="text-nav-lilac-divider mb-8 max-w-md mx-auto">
+        <p className="text-white/75 mb-8 max-w-md mx-auto">
           Creamos tortas y postres a medida para tus celebraciones. Contactanos y lo hacemos realidad.
         </p>
         <Link
