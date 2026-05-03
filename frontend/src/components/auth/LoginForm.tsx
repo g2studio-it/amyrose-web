@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { loginSchema, type LoginInput } from '@/schemas/auth.schema';
@@ -66,7 +66,9 @@ export function LoginForm({ initialError }: LoginFormProps) {
         return;
       }
 
-      toast.success('¡Bienvenida!');
+      const session = await getSession();
+      const name = session?.user?.name ?? session?.user?.email?.split('@')[0] ?? '';
+      toast.success(`¡Hola, ${name}!`, { closeButton: true });
       router.push(`/${locale}`);
       router.refresh();
     } catch {
