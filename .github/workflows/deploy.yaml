@@ -144,6 +144,9 @@ jobs:
           sed -i "s|\${MERCADOPAGO_ACCESS_TOKEN}|${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}|g" k8s/secrets-rendered.yaml
           sed -i "s|\${MERCADOPAGO_WEBHOOK_SECRET}|${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}|g" k8s/secrets-rendered.yaml
           sed -i "s|\${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}|${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${CLOUDINARY_CLOUD_NAME}|${{ secrets.CLOUDINARY_CLOUD_NAME }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${CLOUDINARY_API_KEY}|${{ secrets.CLOUDINARY_API_KEY }}|g" k8s/secrets-rendered.yaml
+          sed -i "s|\${CLOUDINARY_API_SECRET}|${{ secrets.CLOUDINARY_API_SECRET }}|g" k8s/secrets-rendered.yaml
 
       - name: Render ClusterIssuer manifest
         run: |
