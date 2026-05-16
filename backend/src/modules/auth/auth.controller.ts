@@ -9,6 +9,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiTags,
@@ -56,6 +57,7 @@ export class AuthController {
   // ── POST /auth/login ─────────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('login')
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
@@ -70,6 +72,7 @@ export class AuthController {
   // ── POST /auth/refresh ───────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('access-token')

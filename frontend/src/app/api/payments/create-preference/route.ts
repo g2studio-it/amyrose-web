@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { orderId } = await req.json();
+    const { orderId, locale = 'es' } = await req.json();
 
-    const order = await prisma.order.findUnique({
+    const order = await prisma.order.findFirst({
       where: { id: orderId, userId: session.user.id },
       include: { items: true },
     });
@@ -21,11 +21,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+    const ordersUrl = `${appUrl}/${locale}/orders`;
+    const isLocalhost = appUrl.includes('localhost') || appUrl.includes('127.0.0.1');
 
     const preference = await preferenceClient.create({
       body: {
-        items: order.items.map((item) => ({
+        items: order.items.map((item: { variantId: string; productName: string; variantName: string; quantity: number; unitPrice: number | { toNumber(): number } }) => ({
           id: item.variantId,
           title: `${item.productName} — ${item.variantName}`,
           quantity: item.quantity,
@@ -33,13 +35,13 @@ export async function POST(req: NextRequest) {
           currency_id: 'ARS',
         })),
         back_urls: {
-          success: `${appUrl}/es/checkout/success?orderId=${orderId}`,
-          failure: `${appUrl}/es/checkout?orderId=${orderId}&status=failure`,
-          pending: `${appUrl}/es/checkout/success?orderId=${orderId}&status=pending`,
+          success: `${ordersUrl}?payment=success&orderId=${orderId}`,
+          failure: `${ordersUrl}?payment=failure&orderId=${orderId}`,
+          pending: `${ordersUrl}?payment=pending&orderId=${orderId}`,
         },
-        auto_return: 'approved',
+        ...(isLocalhost ? {} : { auto_return: 'approved' }),
         external_reference: orderId,
-        notification_url: `${appUrl}/api/payments/webhook`,
+        ...(!isLocalhost ? { notification_url: `${appUrl}/api/payments/webhook` } : {}),
       },
     });
 

@@ -16,7 +16,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-      // CDN / storage for product images (update hostname when deploying)
+      // Cloudinary product images
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
       {
         protocol: 'https',
         hostname: '**.cloudinary.com',

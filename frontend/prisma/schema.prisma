@@ -286,3 +286,14 @@ model Post {
 
   @@map("posts")
 }
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}

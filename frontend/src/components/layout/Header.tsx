@@ -205,92 +205,135 @@ export function Header() {
               )}
             </Link>
 
-            {/* User icon — desktop only */}
+            {/* User menu — desktop only */}
             {status !== 'loading' && (
               <div className="hidden md:block relative" ref={userMenuRef}>
                 {session?.user ? (
                   <>
+                    {/* Avatar trigger */}
                     <button
                       onClick={() => setUserMenuOpen((v) => !v)}
                       aria-label="Mi cuenta"
                       aria-haspopup="true"
                       aria-expanded={userMenuOpen}
-                      className={`${iconBtnClass} ${userMenuOpen ? 'text-nav-burgundy bg-nav-lilac-bg' : ''}`}
+                      className="flex items-center gap-2 rounded-full pl-1.5 pr-2.5 py-1 hover:bg-nav-lilac-bg transition-colors"
                     >
-                      <User className="h-4.5 w-4.5" />
+                      {/* Avatar circle */}
+                      <div className="h-7 w-7 rounded-full bg-[#6B1A2B] flex items-center justify-center text-white text-xs font-bold font-serif flex-shrink-0 ring-2 ring-[#6B1A2B]/20">
+                        {(session.user.name ?? session.user.email ?? 'U')[0].toUpperCase()}
+                      </div>
+                      <ChevronDown
+                        className={`h-3.5 w-3.5 text-nav-purple transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`}
+                      />
                     </button>
 
-                    {/* User dropdown */}
+                    {/* Dropdown */}
                     <div
-                      className={`absolute right-0 top-full mt-2 w-52 bg-background dark:bg-card border border-nav-lilac-divider dark:border-dm-secondary/40 rounded-xl shadow-xl overflow-hidden transition-all duration-150 ${
+                      className={`absolute right-0 top-full mt-2 w-56 bg-background dark:bg-card border border-nav-lilac-divider dark:border-dm-secondary/40 rounded-xl shadow-xl overflow-hidden transition-all duration-150 ${
                         userMenuOpen
                           ? 'opacity-100 translate-y-0 pointer-events-auto'
                           : 'opacity-0 -translate-y-1 pointer-events-none'
                       }`}
                       role="menu"
                     >
-                      {/* User info header */}
-                      <div className="px-4 py-3 border-b border-nav-lilac-divider/60 dark:border-dm-secondary/30 bg-nav-lilac-bg/40 dark:bg-dm-primary/30">
-                        <p className="font-serif text-sm font-semibold text-nav-burgundy dark:text-white truncate">
-                          {session.user.name ?? 'Mi cuenta'}
-                        </p>
-                        <p className="text-xs text-nav-purple/60 dark:text-[#F5E6F0]/70 truncate">{session.user.email}</p>
+                      {/* Header */}
+                      <div className="px-4 py-3 border-b border-nav-lilac-divider/60 dark:border-dm-secondary/30 bg-nav-lilac-bg/50 dark:bg-dm-primary/20">
+                        <div className="flex items-center gap-2.5">
+                          <div className="h-8 w-8 rounded-full bg-[#6B1A2B] flex items-center justify-center text-white text-sm font-bold font-serif flex-shrink-0">
+                            {(session.user.name ?? session.user.email ?? 'U')[0].toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-serif text-sm font-semibold text-nav-burgundy dark:text-white truncate leading-tight">
+                              {session.user.name ?? 'Mi cuenta'}
+                            </p>
+                            <p className="text-[10px] text-nav-purple/55 dark:text-[#F5E6F0]/60 truncate leading-tight">
+                              {session.user.email}
+                            </p>
+                          </div>
+                        </div>
+                        {isAdmin && (
+                          <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#6B1A2B]/10 px-2 py-0.5 text-[10px] font-semibold text-[#6B1A2B] uppercase tracking-wider">
+                            Administrador
+                          </span>
+                        )}
                       </div>
 
-                      <Link
-                        href={`/${locale}/profile`}
-                        role="menuitem"
-                        className={menuItemClass}
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <User className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                        Mi perfil
-                      </Link>
+                      {/* Nav items */}
+                      <div className="py-1">
+                        <Link
+                          href={`/${locale}/profile`}
+                          role="menuitem"
+                          className={menuItemClass}
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <User className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                          Mi perfil
+                        </Link>
 
-                      <Link
-                        href={`/${locale}/orders`}
-                        role="menuitem"
-                        className={menuItemClass}
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <ClipboardList className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                        Mis pedidos
-                      </Link>
+                        {!isAdmin && (
+                          <>
+                            <Link
+                              href={`/${locale}/orders`}
+                              role="menuitem"
+                              className={menuItemClass}
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              <ClipboardList className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                              Mis pedidos
+                            </Link>
 
-                      {isAdmin && (
-                        <>
-                          <div className="mx-3 h-px bg-nav-lilac-divider/60 dark:bg-dm-secondary/30" />
-                          <Link
-                            href={`/${locale}/admin/dashboard`}
-                            role="menuitem"
-                            className={menuItemClass}
-                            onClick={() => setUserMenuOpen(false)}
-                          >
-                            <LayoutDashboard className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                            Dashboard
-                          </Link>
-                        </>
-                      )}
+                            <Link
+                              href={`/${locale}/cart`}
+                              role="menuitem"
+                              className={menuItemClass}
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              <ShoppingCart className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                              Mi carrito
+                              {totalItems > 0 && (
+                                <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[#6B1A2B] px-1 text-[10px] font-bold text-white">
+                                  {totalItems}
+                                </span>
+                              )}
+                            </Link>
+                          </>
+                        )}
 
-                      <div className="mx-3 h-px bg-nav-lilac-divider/60 dark:bg-dm-secondary/30" />
+                        {isAdmin && (
+                          <>
+                            <div className="mx-3 my-1 h-px bg-nav-lilac-divider/60 dark:bg-dm-secondary/30" />
+                            <Link
+                              href={`/${locale}/admin/dashboard`}
+                              role="menuitem"
+                              className={menuItemClass}
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              <LayoutDashboard className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                              Panel admin
+                            </Link>
+                          </>
+                        )}
 
-                      <button
-                        role="menuitem"
-                        onClick={handleLogout}
-                        className={`${menuItemClass} text-nav-burgundy hover:bg-red-50 dark:hover:bg-red-900/30`}
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Cerrar sesión
-                      </button>
+                        <div className="mx-3 my-1 h-px bg-nav-lilac-divider/60 dark:bg-dm-secondary/30" />
+
+                        <button
+                          role="menuitem"
+                          onClick={handleLogout}
+                          className={`${menuItemClass} text-nav-burgundy hover:bg-red-50 dark:hover:bg-red-900/30`}
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Cerrar sesión
+                        </button>
+                      </div>
                     </div>
                   </>
                 ) : (
                   <Link
                     href={`/${locale}/login`}
-                    aria-label="Iniciar sesión"
-                    className={iconBtnClass}
+                    className="flex items-center gap-2 rounded-full px-3 py-1.5 border border-nav-lilac-divider hover:border-nav-burgundy text-nav-purple hover:text-nav-burgundy font-serif text-sm transition-colors"
                   >
-                    <User className="h-4.5 w-4.5" />
+                    <User className="h-4 w-4" />
+                    Ingresar
                   </Link>
                 )}
               </div>
@@ -384,45 +427,73 @@ export function Header() {
         </nav>
 
         {/* Panel footer — auth */}
-        <div className="px-5 py-4 border-t border-nav-lilac-divider dark:border-dm-secondary/30">
+        <div className="px-4 py-4 border-t border-nav-lilac-divider dark:border-dm-secondary/30">
           {session?.user ? (
-            <div className="flex flex-col gap-1">
-              <div className="mb-2 pb-2 border-b border-nav-lilac-divider/60 dark:border-dm-secondary/20">
-                <p className="font-serif text-sm font-semibold text-nav-burgundy truncate">
-                  {session.user.name ?? 'Mi cuenta'}
-                </p>
-                <p className="text-xs text-nav-purple/60 truncate">{session.user.email}</p>
+            <div className="flex flex-col gap-0.5">
+              {/* User identity */}
+              <div className="flex items-center gap-3 mb-3 pb-3 border-b border-nav-lilac-divider/60 dark:border-dm-secondary/20">
+                <div className="h-9 w-9 rounded-full bg-[#6B1A2B] flex items-center justify-center text-white font-serif font-bold text-sm flex-shrink-0">
+                  {(session.user.name ?? session.user.email ?? 'U')[0].toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-serif text-sm font-semibold text-nav-burgundy truncate leading-tight">
+                    {session.user.name ?? 'Mi cuenta'}
+                  </p>
+                  {isAdmin && (
+                    <span className="text-[10px] font-semibold text-[#6B1A2B]/70 uppercase tracking-wider">
+                      Administrador
+                    </span>
+                  )}
+                </div>
               </div>
+
               <Link
                 href={`/${locale}/profile`}
-                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
+                className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
-                <User className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
+                <User className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
                 Mi perfil
               </Link>
-              <Link
-                href={`/${locale}/orders`}
-                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <ClipboardList className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                Mis pedidos
-              </Link>
+              {!isAdmin && (
+                <>
+                  <Link
+                    href={`/${locale}/orders`}
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <ClipboardList className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
+                    Mis pedidos
+                  </Link>
+                  <Link
+                    href={`/${locale}/cart`}
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <ShoppingCart className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
+                    Mi carrito
+                    {totalItems > 0 && (
+                      <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[#6B1A2B] px-1 text-[10px] font-bold text-white">
+                        {totalItems}
+                      </span>
+                    )}
+                  </Link>
+                </>
+              )}
               {isAdmin && (
                 <Link
                   href={`/${locale}/admin/dashboard`}
-                  className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-purple hover:text-nav-burgundy transition-colors"
+                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-purple hover:bg-nav-lilac-bg hover:text-nav-burgundy transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <LayoutDashboard className="h-4 w-4 text-nav-burgundy dark:text-[#E0B8D8]" />
-                  Dashboard
+                  <LayoutDashboard className="h-4 w-4 text-nav-burgundy/70 dark:text-[#E0B8D8]" />
+                  Panel admin
                 </Link>
               )}
               <div className="my-1 h-px bg-nav-lilac-divider/60 dark:bg-dm-secondary/30" />
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2.5 py-2 font-serif text-sm text-nav-burgundy hover:text-nav-purple transition-colors"
+                className="flex items-center gap-2.5 px-2 py-2 rounded-lg font-serif text-sm text-nav-burgundy hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 Cerrar sesión
@@ -431,7 +502,7 @@ export function Header() {
           ) : (
             <Link
               href={`/${locale}/login`}
-              className="flex items-center justify-center gap-2 font-serif text-sm border-2 border-nav-burgundy dark:border-dm-secondary text-nav-purple px-4 py-2.5 rounded hover:bg-nav-burgundy dark:hover:bg-dm-secondary hover:text-white transition-all"
+              className="flex items-center justify-center gap-2 font-serif text-sm border-2 border-nav-burgundy dark:border-dm-secondary text-nav-purple px-4 py-2.5 rounded-xl hover:bg-nav-burgundy dark:hover:bg-dm-secondary hover:text-white transition-all"
               onClick={() => setMobileOpen(false)}
             >
               <User className="h-4 w-4" />

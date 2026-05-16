@@ -2,9 +2,10 @@
 
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Pencil, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createPostAction, updatePostAction, type PostFormData } from '@/actions/posts';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 type Post = {
   id: string;
@@ -31,7 +32,7 @@ function slugify(text: string) {
 }
 
 const FIELD =
-  'w-full rounded-lg border border-[#6B1A2B]/20 bg-white px-3 py-2 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:outline-none focus:ring-2 focus:ring-[#6B1A2B]/30';
+  'w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-brand-burgundy/30';
 
 export function ArticleFormDialog({ post }: Props) {
   const isEdit = !!post;
@@ -88,7 +89,7 @@ export function ArticleFormDialog({ post }: Props) {
         onClick={handleOpen}
         className={
           isEdit
-            ? 'inline-flex items-center justify-center h-8 w-8 rounded-lg text-[#3B1F5E]/40 hover:bg-[#F9F5FB] hover:text-[#3B1F5E] transition-colors'
+            ? 'inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground/70 hover:bg-muted hover:text-nav-purple transition-colors'
             : 'inline-flex items-center gap-2 rounded-xl bg-[#6B1A2B] px-4 py-2 text-sm font-medium text-white hover:bg-[#6B1A2B]/85 transition-colors'
         }
         aria-label={isEdit ? 'Editar artículo' : undefined}
@@ -98,12 +99,12 @@ export function ArticleFormDialog({ post }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpen(false)}>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#6B1A2B]/10">
-              <h2 className="font-serif font-bold text-lg text-[#3B1F5E]">
+          <div className="relative bg-card rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h2 className="font-serif font-bold text-lg text-nav-purple">
                 {isEdit ? 'Editar artículo' : 'Nuevo artículo'}
               </h2>
-              <button onClick={() => setOpen(false)} className="rounded-lg p-1.5 text-[#3B1F5E]/40 hover:bg-[#F9F5FB] transition-colors">
+              <button onClick={() => setOpen(false)} className="rounded-lg p-1.5 text-muted-foreground/70 hover:bg-muted transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -111,13 +112,13 @@ export function ArticleFormDialog({ post }: Props) {
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-xs font-medium text-[#3B1F5E]/60 mb-1">Título *</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Título *</label>
                 <input value={title} onChange={(e) => setTitle(e.target.value)} className={FIELD} placeholder="Mi artículo" required />
               </div>
 
               {/* Slug */}
               <div>
-                <label className="block text-xs font-medium text-[#3B1F5E]/60 mb-1">Slug *</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Slug *</label>
                 <input
                   value={slug}
                   onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
@@ -129,40 +130,42 @@ export function ArticleFormDialog({ post }: Props) {
 
               {/* Excerpt */}
               <div>
-                <label className="block text-xs font-medium text-[#3B1F5E]/60 mb-1">Descripción</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Descripción</label>
                 <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} className={`${FIELD} resize-none`} placeholder="Breve descripción del artículo..." />
               </div>
 
               {/* Content */}
               <div>
-                <label className="block text-xs font-medium text-[#3B1F5E]/60 mb-1">Contenido *</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Contenido *</label>
                 <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={5} className={`${FIELD} resize-none`} placeholder="Contenido completo..." required />
               </div>
 
-              {/* Image URL */}
+              {/* Image */}
               <div>
-                <label className="block text-xs font-medium text-[#3B1F5E]/60 mb-1 flex items-center gap-1">
-                  <ImageIcon className="h-3.5 w-3.5" /> URL de imagen
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  Imagen
                 </label>
-                <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={FIELD} placeholder="https://..." type="url" />
-                {imageUrl && (
-                  <img src={imageUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg border border-[#6B1A2B]/10" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                )}
+                <ImageUpload
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  folder="amyrose/posts"
+                  previewClassName="h-32 w-full"
+                />
               </div>
 
               {/* Published */}
               <label className="flex items-center gap-3 cursor-pointer select-none">
                 <div
                   onClick={() => setIsPublished((v) => !v)}
-                  className={`relative h-5 w-9 rounded-full transition-colors ${isPublished ? 'bg-[#6B1A2B]' : 'bg-[#3B1F5E]/20'}`}
+                  className={`relative h-5 w-9 rounded-full transition-colors ${isPublished ? 'bg-[#6B1A2B]' : 'bg-border'}`}
                 >
-                  <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${isPublished ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                  <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-card shadow transition-transform ${isPublished ? 'translate-x-4' : 'translate-x-0.5'}`} />
                 </div>
-                <span className="text-sm text-[#3B1F5E]/70">Publicado</span>
+                <span className="text-sm text-muted-foreground">Publicado</span>
               </label>
 
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 text-sm text-[#3B1F5E]/60 hover:text-[#3B1F5E] transition-colors">
+                <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 text-sm text-muted-foreground hover:text-nav-purple transition-colors">
                   Cancelar
                 </button>
                 <button

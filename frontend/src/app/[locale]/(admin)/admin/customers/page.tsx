@@ -26,7 +26,7 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
         <p className="text-sm text-nav-purple/50 mt-0.5">{result.total} usuarios registrados</p>
       </div>
 
-      <div className="bg-white dark:bg-card rounded-xl border border-nav-burgundy/10 dark:border-dm-secondary/20 overflow-hidden">
+      <div className="bg-card dark:bg-card rounded-xl border border-nav-burgundy/10 dark:border-dm-secondary/20 overflow-hidden">
         <CustomersTable users={result.data} />
       </div>
 
@@ -38,12 +38,12 @@ export default async function AdminCustomersPage({ params, searchParams }: Props
           </span>
           <div className="flex gap-2">
             {page > 1 && (
-              <a href={`/${locale}/admin/customers?page=${page - 1}`} className="px-3 py-1.5 rounded-lg border border-nav-burgundy/15 hover:bg-[#F9F5FB] dark:hover:bg-[#3D3845] text-nav-purple transition-colors">
+              <a href={`/${locale}/admin/customers?page=${page - 1}`} className="px-3 py-1.5 rounded-lg border border-nav-burgundy/15 hover:bg-muted dark:hover:bg-[#3D3845] text-nav-purple transition-colors">
                 ← Anterior
               </a>
             )}
             {page < totalPages && (
-              <a href={`/${locale}/admin/customers?page=${page + 1}`} className="px-3 py-1.5 rounded-lg border border-nav-burgundy/15 hover:bg-[#F9F5FB] dark:hover:bg-[#3D3845] text-nav-purple transition-colors">
+              <a href={`/${locale}/admin/customers?page=${page + 1}`} className="px-3 py-1.5 rounded-lg border border-nav-burgundy/15 hover:bg-muted dark:hover:bg-[#3D3845] text-nav-purple transition-colors">
                 Siguiente →
               </a>
             )}

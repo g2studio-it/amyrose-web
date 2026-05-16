@@ -1,27 +1,33 @@
 # ─── Stage 1: Dependencies ───────────────────────────────────────────────────
 FROM node:20-alpine AS deps
-WORKDIR /app
 
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-RUN corepack enable && \
-    if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    else npm install; fi
+RUN --mount=type=cache,id=pnpm-frontend,target=/pnpm/store \
+    pnpm install --frozen-lockfile --ignore-scripts
 
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 
 # ─── Stage 2: Build ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
-WORKDIR /app
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN corepack enable && npm run build
+RUN pnpm run build
 
 # ─── Stage 3: Migrator (used by migration job) ──────────────────────────────
 FROM node:20-alpine AS migrator

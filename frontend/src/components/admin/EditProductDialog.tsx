@@ -13,6 +13,7 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { toast } from 'sonner';
 import {
   updateAdminProductAction,
@@ -38,7 +39,7 @@ function slugify(text: string) {
 }
 
 const INPUT =
-  'w-full rounded-lg border border-[#6B1A2B]/20 bg-white px-3 py-2 text-sm text-[#3B1F5E] placeholder:text-[#3B1F5E]/30 focus:border-[#6B1A2B]/50 focus:outline-none focus:ring-2 focus:ring-[#6B1A2B]/10';
+  'w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-nav-purple placeholder:text-muted-foreground/50 focus:border-brand-burgundy/50 focus:outline-none focus:ring-2 focus:ring-brand-burgundy/10';
 
 // ── Image row ──────────────────────────────────────────────────────────────
 
@@ -61,15 +62,15 @@ function ImageRow({ image, productId }: { image: ApiImage; productId: string }) 
     });
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-[#6B1A2B]/12 bg-[#F9F5FB]/50 p-2.5">
-      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-[#6B1A2B]/10">
+    <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-2.5">
+      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-border">
         <img src={image.url} alt={image.altText ?? ''} className="h-full w-full object-cover" />
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-medium text-[#3B1F5E]">{image.url}</p>
+        <p className="truncate text-xs font-medium text-nav-purple">{image.url}</p>
         {image.altText && (
-          <p className="truncate text-[10px] text-[#3B1F5E]/40">{image.altText}</p>
+          <p className="truncate text-[10px] text-muted-foreground/70">{image.altText}</p>
         )}
       </div>
 
@@ -131,15 +132,15 @@ function AddImageForm({ productId }: { productId: string }) {
   };
 
   return (
-    <div className="space-y-2 rounded-lg border border-dashed border-[#6B1A2B]/20 p-3">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#3B1F5E]/40">
+    <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
         Agregar imagen
       </p>
-      <input
+      <ImageUpload
         value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="URL de la imagen (https://…)"
-        className={INPUT}
+        onChange={setUrl}
+        folder="amyrose/products"
+        previewClassName="h-28 w-full"
       />
       <div className="flex gap-2">
         <input
@@ -148,7 +149,7 @@ function AddImageForm({ productId }: { productId: string }) {
           placeholder="Texto alternativo (opcional)"
           className={`${INPUT} flex-1`}
         />
-        <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#6B1A2B]/20 px-3 text-xs text-[#3B1F5E]/60 hover:bg-[#F9F5FB]">
+        <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 text-xs text-muted-foreground hover:bg-muted">
           <input
             type="checkbox"
             checked={isPrimary}
@@ -161,7 +162,7 @@ function AddImageForm({ productId }: { productId: string }) {
       <button
         onClick={handleAdd}
         disabled={!url.trim() || isPending}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-1.5 text-xs font-medium text-[#6B1A2B] transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-1.5 text-xs font-medium text-brand-burgundy transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
         Agregar
@@ -216,18 +217,18 @@ function VariantRow({ variant, productId }: { variant: ApiVariant; productId: st
     });
 
   return (
-    <div className="rounded-lg border border-[#6B1A2B]/12 bg-[#F9F5FB]/50 p-3 space-y-2">
+    <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-2">
       {editing ? (
         <>
           <div className="grid grid-cols-3 gap-2">
             <div className="col-span-3 space-y-1">
-              <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">Nombre</label>
+              <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Nombre</label>
               <input value={name} onChange={(e) => setName(e.target.value)} className={INPUT} />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">Precio</label>
+              <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Precio</label>
               <div className="relative">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#3B1F5E]/40">$</span>
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground/70">$</span>
                 <input
                   type="number" min="0" step="0.01"
                   value={price} onChange={(e) => setPrice(e.target.value)}
@@ -236,7 +237,7 @@ function VariantRow({ variant, productId }: { variant: ApiVariant; productId: st
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-medium uppercase tracking-wide text-[#3B1F5E]/50">Stock</label>
+              <label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Stock</label>
               <input
                 type="number" min="0"
                 value={stock} onChange={(e) => setStock(e.target.value)}
@@ -254,7 +255,7 @@ function VariantRow({ variant, productId }: { variant: ApiVariant; productId: st
             </button>
             <button
               onClick={() => setEditing(false)} disabled={isPending}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-[#3B1F5E]/50 hover:bg-white"
+              className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-card"
             >
               Cancelar
             </button>
@@ -270,17 +271,17 @@ function VariantRow({ variant, productId }: { variant: ApiVariant; productId: st
             }`}
           />
           <div className="min-w-0 flex-1">
-            <p className={`text-sm font-medium ${variant.isActive ? 'text-[#3B1F5E]' : 'text-[#3B1F5E]/40 line-through'}`}>
+            <p className={`text-sm font-medium ${variant.isActive ? 'text-nav-purple' : 'text-muted-foreground/70 line-through'}`}>
               {variant.name}
             </p>
-            <p className="text-xs text-[#3B1F5E]/50">
+            <p className="text-xs text-muted-foreground">
               ${Number(variant.price).toLocaleString('es-AR')} · {variant.stock} en stock
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <button
               onClick={() => setEditing(true)} disabled={isPending}
-              className="rounded-md p-1.5 text-[#3B1F5E]/40 transition-colors hover:bg-white hover:text-[#3B1F5E]"
+              className="rounded-md p-1.5 text-muted-foreground/70 transition-colors hover:bg-card hover:text-nav-purple"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -326,8 +327,8 @@ function AddVariantForm({ productId }: { productId: string }) {
   };
 
   return (
-    <div className="space-y-2 rounded-lg border border-dashed border-[#6B1A2B]/20 p-3">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#3B1F5E]/40">
+    <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
         Nueva variante
       </p>
       <input
@@ -337,7 +338,7 @@ function AddVariantForm({ productId }: { productId: string }) {
       />
       <div className="grid grid-cols-3 gap-2">
         <div className="relative">
-          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#3B1F5E]/40">$</span>
+          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground/70">$</span>
           <input
             type="number" min="0" step="0.01"
             value={price} onChange={(e) => setPrice(e.target.value)}
@@ -360,7 +361,7 @@ function AddVariantForm({ productId }: { productId: string }) {
       <button
         onClick={handleAdd}
         disabled={!name.trim() || !price || isPending}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-1.5 text-xs font-medium text-[#6B1A2B] transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-[#6B1A2B]/10 px-3 py-1.5 text-xs font-medium text-brand-burgundy transition-colors hover:bg-[#6B1A2B]/20 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
         Agregar
@@ -424,7 +425,7 @@ export function EditProductDialog({ product, categories }: Props) {
       <button
         onClick={() => setOpen(true)}
         title="Editar producto"
-        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#3B1F5E]/60 transition-colors hover:bg-[#F9F5FB] hover:text-[#3B1F5E]"
+        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-nav-purple"
       >
         <Pencil className="h-3.5 w-3.5" />
         Editar
@@ -437,21 +438,21 @@ export function EditProductDialog({ product, categories }: Props) {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
           {/* Panel */}
-          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" style={{ maxHeight: '92vh' }}>
+          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-card shadow-2xl" style={{ maxHeight: '92vh' }}>
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-[#6B1A2B]/10 px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-6 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#6B1A2B]/10">
-                  <PackageOpen className="h-4 w-4 text-[#6B1A2B]" />
+                  <PackageOpen className="h-4 w-4 text-brand-burgundy" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-[#3B1F5E]">Editar producto</h2>
-                  <p className="max-w-xs truncate text-xs text-[#3B1F5E]/40">{product.name}</p>
+                  <h2 className="text-base font-semibold text-nav-purple">Editar producto</h2>
+                  <p className="max-w-xs truncate text-xs text-muted-foreground/70">{product.name}</p>
                 </div>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1.5 text-[#3B1F5E]/40 transition-colors hover:bg-[#F9F5FB] hover:text-[#3B1F5E]"
+                className="rounded-lg p-1.5 text-muted-foreground/70 transition-colors hover:bg-muted hover:text-nav-purple"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -460,14 +461,14 @@ export function EditProductDialog({ product, categories }: Props) {
             {/* Body — two columns */}
             <div className="flex flex-1 overflow-hidden">
               {/* Left: basic info */}
-              <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-[#6B1A2B]/8 px-5 py-5">
+              <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-border px-5 py-5">
                 <div className="flex-1 space-y-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A98EC5]">
                     Información básica
                   </p>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[#3B1F5E]">Nombre *</label>
+                    <label className="text-xs font-medium text-nav-purple">Nombre *</label>
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -476,7 +477,7 @@ export function EditProductDialog({ product, categories }: Props) {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[#3B1F5E]">Slug *</label>
+                    <label className="text-xs font-medium text-nav-purple">Slug *</label>
                     <input
                       value={slug}
                       onChange={(e) => setSlug(e.target.value)}
@@ -485,14 +486,14 @@ export function EditProductDialog({ product, categories }: Props) {
                     <button
                       type="button"
                       onClick={() => setSlug(slugify(name))}
-                      className="text-[10px] text-[#6B1A2B]/60 hover:text-[#6B1A2B]"
+                      className="text-[10px] text-brand-burgundy/60 hover:text-brand-burgundy"
                     >
                       ↺ Regenerar desde nombre
                     </button>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[#3B1F5E]">Categoría *</label>
+                    <label className="text-xs font-medium text-nav-purple">Categoría *</label>
                     <div className="relative">
                       <select
                         value={categoryId}
@@ -503,14 +504,14 @@ export function EditProductDialog({ product, categories }: Props) {
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                       </select>
-                      <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#3B1F5E]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[#3B1F5E]">Descripción</label>
+                    <label className="text-xs font-medium text-nav-purple">Descripción</label>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -521,29 +522,29 @@ export function EditProductDialog({ product, categories }: Props) {
                   </div>
 
                   <div className="space-y-2 pt-1">
-                    <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[#6B1A2B]/15 px-3 py-2">
+                    <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border px-3 py-2">
                       <input
                         type="checkbox"
                         checked={isFeatured}
                         onChange={(e) => setIsFeatured(e.target.checked)}
                         className="h-4 w-4 accent-[#6B1A2B]"
                       />
-                      <span className="text-sm text-[#3B1F5E]/70">Destacado</span>
+                      <span className="text-sm text-muted-foreground">Destacado</span>
                     </label>
-                    <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[#6B1A2B]/15 px-3 py-2">
+                    <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border px-3 py-2">
                       <input
                         type="checkbox"
                         checked={isActive}
                         onChange={(e) => setIsActive(e.target.checked)}
                         className="h-4 w-4 accent-[#6B1A2B]"
                       />
-                      <span className="text-sm text-[#3B1F5E]/70">Activo</span>
+                      <span className="text-sm text-muted-foreground">Activo</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Save */}
-                <div className="mt-5 shrink-0 border-t border-[#6B1A2B]/8 pt-4">
+                <div className="mt-5 shrink-0 border-t border-border pt-4">
                   <button
                     onClick={handleSave}
                     disabled={isPending}
@@ -563,7 +564,7 @@ export function EditProductDialog({ product, categories }: Props) {
                     Imágenes
                   </p>
                   {sortedImages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[#6B1A2B]/15 py-8 text-[#3B1F5E]/30">
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border py-8 text-muted-foreground/50">
                       <ImageIcon className="h-8 w-8 opacity-40" />
                       <p className="text-xs">Sin imágenes</p>
                     </div>
@@ -583,7 +584,7 @@ export function EditProductDialog({ product, categories }: Props) {
                     Variantes
                   </p>
                   {sortedVariants.length === 0 ? (
-                    <p className="text-xs text-[#3B1F5E]/30">Sin variantes</p>
+                    <p className="text-xs text-muted-foreground/50">Sin variantes</p>
                   ) : (
                     <div className="space-y-2">
                       {sortedVariants.map((v) => (

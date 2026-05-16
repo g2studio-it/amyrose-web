@@ -1,11 +1,21 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { Eye } from 'lucide-react';
 import { auth } from '@/auth';
 import { getOrdersAction } from '@/actions/orders';
+import { prisma } from '@/lib/prisma';
+import { paymentClient } from '@/lib/mercadopago';
 
 interface Props {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{
+    payment?: string;
+    orderId?: string;
+    collection_id?: string;
+    payment_id?: string;
+    external_reference?: string;
+  }>;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -17,18 +27,109 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-red-100 text-red-800',
 };
 
-export default async function OrdersPage({ params }: Props) {
+const PAYMENT_STATUS_COLORS: Record<string, string> = {
+  PENDING: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+  APPROVED: 'bg-green-50 text-green-700 border border-green-200',
+  REJECTED: 'bg-red-50 text-red-700 border border-red-200',
+  REFUNDED: 'bg-gray-50 text-gray-600 border border-gray-200',
+};
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: 'Pago pendiente',
+  APPROVED: 'Pago aprobado',
+  REJECTED: 'Pago rechazado',
+  REFUNDED: 'Reembolsado',
+};
+
+const PAYMENT_BANNERS = {
+  success: {
+    bg: 'bg-green-50 border-green-200',
+    text: 'text-green-800',
+    icon: '✅',
+    message: 'Tu pago con MercadoPago fue aprobado. ¡Gracias por tu compra!',
+  },
+  failure: {
+    bg: 'bg-red-50 border-red-200',
+    text: 'text-red-800',
+    icon: '❌',
+    message: 'Hubo un problema al procesar el pago con MercadoPago. Podés intentar nuevamente o elegir otro método.',
+  },
+  pending: {
+    bg: 'bg-yellow-50 border-yellow-200',
+    text: 'text-yellow-800',
+    icon: '⏳',
+    message: 'Tu pago con MercadoPago está pendiente de acreditación. Te notificaremos cuando se confirme.',
+  },
+} as const;
+
+async function verifyMercadoPagoReturn(
+  collectionId: string,
+  userId: string,
+): Promise<void> {
+  try {
+    const mpPayment = await paymentClient.get({ id: Number(collectionId) });
+    const orderId = mpPayment.external_reference;
+    if (!orderId) return;
+
+    const order = await prisma.order.findFirst({ where: { id: orderId, userId } });
+    if (!order) return;
+
+    const paymentStatusMap: Record<string, 'PENDING' | 'APPROVED' | 'REJECTED'> = {
+      approved: 'APPROVED',
+      rejected: 'REJECTED',
+      pending: 'PENDING',
+      in_process: 'PENDING',
+      cancelled: 'REJECTED',
+      refunded: 'REJECTED',
+      charged_back: 'REJECTED',
+    };
+
+    const paymentStatus = paymentStatusMap[mpPayment.status ?? ''] ?? 'PENDING';
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        mpPaymentId: collectionId,
+        paymentStatus,
+        ...(paymentStatus === 'APPROVED' ? { status: 'CONFIRMED' } : {}),
+      },
+    });
+  } catch {
+    // Non-critical — webhook is the authoritative update mechanism
+  }
+}
+
+export default async function OrdersPage({ params, searchParams }: Props) {
   const { locale } = await params;
+  const { payment, collection_id, payment_id } = await searchParams;
   const session = await auth();
   if (!session?.user) redirect(`/${locale}/login`);
+
+  // On return from MercadoPago, verify payment and update order status immediately.
+  // This is a fallback for local dev where the webhook can't reach localhost.
+  const mpPaymentId = collection_id ?? payment_id;
+  if (payment === 'success' && mpPaymentId && session.user.id) {
+    await verifyMercadoPagoReturn(mpPaymentId, session.user.id);
+  }
 
   const t = await getTranslations('orders');
   const orders = await getOrdersAction();
 
+  const banner = payment && payment in PAYMENT_BANNERS
+    ? PAYMENT_BANNERS[payment as keyof typeof PAYMENT_BANNERS]
+    : null;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="mb-8 text-3xl font-extrabold text-brand-burgundy">{t('title')}</h1>
+        <h1 className="mb-6 text-3xl font-extrabold text-brand-burgundy">{t('title')}</h1>
+
+        {banner && (
+          <div className={`mb-6 flex items-start gap-3 rounded-2xl border px-5 py-4 ${banner.bg}`}>
+            <span className="text-xl leading-none">{banner.icon}</span>
+            <p className={`text-sm font-medium ${banner.text}`}>{banner.message}</p>
+          </div>
+        )}
 
         {orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
@@ -62,19 +163,26 @@ export default async function OrdersPage({ params }: Props) {
                   </p>
                   {order.notes && (
                     <p className="text-xs text-muted-foreground mt-1 italic">
-                      {order.notes}
+                      {order.notes.split('\n')[0]}
                     </p>
                   )}
                 </div>
 
                 {/* Status */}
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-end sm:items-center gap-1.5">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       STATUS_COLORS[order.status] ?? 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {t(`status.${order.status}` as Parameters<typeof t>[0])}
+                  </span>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      PAYMENT_STATUS_COLORS[order.paymentStatus] ?? 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {PAYMENT_STATUS_LABELS[order.paymentStatus] ?? order.paymentStatus}
                   </span>
                 </div>
 
@@ -85,6 +193,15 @@ export default async function OrdersPage({ params }: Props) {
                     ${Number(order.total).toLocaleString('es-AR')}
                   </p>
                 </div>
+
+                {/* View detail */}
+                <Link
+                  href={`/${locale}/orders/success?orderId=${order.id}`}
+                  className="shrink-0 flex items-center justify-center h-9 w-9 rounded-xl border border-border text-muted-foreground transition-colors hover:border-brand-burgundy/40 hover:text-brand-burgundy hover:bg-brand-burgundy/5"
+                  title="Ver detalle"
+                >
+                  <Eye className="h-4 w-4" />
+                </Link>
               </div>
             ))}
           </div>
