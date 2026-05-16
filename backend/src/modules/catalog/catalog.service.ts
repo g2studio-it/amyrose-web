@@ -40,11 +40,37 @@ export class CatalogService {
     return this.categoryRepo.save(this.categoryRepo.create(dto));
   }
 
-  async findAllCategories(): Promise<Category[]> {
+  async findAllCategories(includeInactive = false): Promise<Category[]> {
     return this.categoryRepo.find({
-      where: { isActive: true },
+      where: includeInactive ? {} : { isActive: true },
       order: { sortOrder: 'ASC', name: 'ASC' },
     });
+  }
+
+  async updateCategory(id: string, dto: Partial<CreateCategoryDto>): Promise<Category> {
+    const category = await this.categoryRepo.findOne({ where: { id } });
+    if (!category) throw new NotFoundException(`Categoría '${id}' no encontrada`);
+    if (dto.slug && dto.slug !== category.slug) {
+      const conflict = await this.categoryRepo.findOne({ where: { slug: dto.slug } });
+      if (conflict) throw new ConflictException('Ya existe una categoría con ese slug');
+    }
+    await this.categoryRepo.update(id, dto);
+    return this.categoryRepo.findOneOrFail({ where: { id } });
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    const category = await this.categoryRepo.findOne({
+      where: { id },
+      relations: ['products'],
+    });
+    if (!category) throw new NotFoundException(`Categoría '${id}' no encontrada`);
+    const activeProducts = category.products?.filter((p) => p.isActive) ?? [];
+    if (activeProducts.length > 0) {
+      throw new ConflictException(
+        `No se puede eliminar: la categoría tiene ${activeProducts.length} producto(s) activo(s)`,
+      );
+    }
+    await this.categoryRepo.remove(category);
   }
 
   async findCategoryBySlug(slug: string): Promise<Category> {

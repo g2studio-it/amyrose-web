@@ -42,6 +42,15 @@ export class CatalogController {
     return this.catalogService.findAllCategories();
   }
 
+  @Get('categories/all')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Listar todas las categorías (incl. inactivas) — solo ADMIN' })
+  findAllCategoriesAdmin() {
+    return this.catalogService.findAllCategories(true);
+  }
+
   @Public()
   @Get('categories/:slug')
   @ApiParam({ name: 'slug', example: 'tortas' })
@@ -59,6 +68,27 @@ export class CatalogController {
   @ApiResponse({ status: 201, description: 'Categoría creada' })
   createCategory(@Body() dto: CreateCategoryDto) {
     return this.catalogService.createCategory(dto);
+  }
+
+  @Patch('categories/:id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiParam({ name: 'id', description: 'UUID de la categoría' })
+  @ApiOperation({ summary: 'Actualizar categoría — solo ADMIN' })
+  updateCategory(@Param('id') id: string, @Body() dto: CreateCategoryDto) {
+    return this.catalogService.updateCategory(id, dto);
+  }
+
+  @Delete('categories/:id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiParam({ name: 'id', description: 'UUID de la categoría' })
+  @ApiOperation({ summary: 'Eliminar categoría — solo ADMIN' })
+  deleteCategory(@Param('id') id: string) {
+    return this.catalogService.deleteCategory(id);
   }
 
   // ── Products (public reads / admin writes) ────────────────────────────────

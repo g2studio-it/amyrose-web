@@ -93,13 +93,14 @@ export async function toggleUserActiveAction(
 
 export async function getAdminCategoriesAction(): Promise<ApiCategory[]> {
   const token = await getAdminToken();
-  return api.get<ApiCategory[]>('/catalog/categories', token);
+  return api.get<ApiCategory[]>('/catalog/categories/all', token);
 }
 
 export async function createAdminCategoryAction(data: {
   name: string;
   slug: string;
   description?: string;
+  sortOrder?: number;
 }): Promise<{ error?: string }> {
   try {
     const token = await getAdminToken();
@@ -108,6 +109,37 @@ export async function createAdminCategoryAction(data: {
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al crear categoría' };
+  }
+}
+
+export async function updateAdminCategoryAction(
+  id: string,
+  data: {
+    name?: string;
+    slug?: string;
+    description?: string;
+    isActive?: boolean;
+    sortOrder?: number;
+  },
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.patch<ApiCategory>(`/catalog/categories/${id}`, data, token);
+    revalidatePath('/[locale]/admin/categories', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al actualizar categoría' };
+  }
+}
+
+export async function deleteAdminCategoryAction(id: string): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.delete(`/catalog/categories/${id}`, token);
+    revalidatePath('/[locale]/admin/categories', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al eliminar categoría' };
   }
 }
 
