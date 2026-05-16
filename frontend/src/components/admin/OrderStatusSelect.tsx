@@ -14,12 +14,12 @@ const ORDER_STATUSES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING:    'bg-yellow-50 text-yellow-800 border-yellow-200',
-  CONFIRMED:  'bg-blue-50 text-blue-800 border-blue-200',
-  PROCESSING: 'bg-purple-50 text-purple-800 border-purple-200',
-  READY:      'bg-green-50 text-green-800 border-green-200',
-  DELIVERED:  'bg-gray-50 text-gray-700 border-gray-200',
-  CANCELLED:  'bg-red-50 text-red-800 border-red-200',
+  PENDING:    'bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800/50',
+  CONFIRMED:  'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50',
+  PROCESSING: 'bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50',
+  READY:      'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50',
+  DELIVERED:  'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800/60 dark:text-gray-300 dark:border-gray-700/50',
+  CANCELLED:  'bg-red-50 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50',
 };
 
 interface OrderStatusSelectProps {

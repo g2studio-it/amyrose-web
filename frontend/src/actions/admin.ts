@@ -93,13 +93,14 @@ export async function toggleUserActiveAction(
 
 export async function getAdminCategoriesAction(): Promise<ApiCategory[]> {
   const token = await getAdminToken();
-  return api.get<ApiCategory[]>('/catalog/categories', token);
+  return api.get<ApiCategory[]>('/catalog/categories/all', token);
 }
 
 export async function createAdminCategoryAction(data: {
   name: string;
   slug: string;
   description?: string;
+  sortOrder?: number;
 }): Promise<{ error?: string }> {
   try {
     const token = await getAdminToken();

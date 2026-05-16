@@ -5,6 +5,24 @@ import { Eye, X, ShoppingBag, Package, CreditCard, Truck, FileText } from 'lucid
 import { OrderStatusSelect } from '@/components/admin/OrderStatusSelect';
 import type { ApiOrder } from '@/lib/api';
 
+const STATUS_COLORS: Record<string, string> = {
+  PENDING:    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+  CONFIRMED:  'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  PROCESSING: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+  READY:      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+  DELIVERED:  'bg-gray-100 text-gray-700 dark:bg-gray-800/60 dark:text-gray-300',
+  CANCELLED:  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING:    'Pendiente',
+  CONFIRMED:  'Confirmado',
+  PROCESSING: 'En proceso',
+  READY:      'Listo',
+  DELIVERED:  'Entregado',
+  CANCELLED:  'Cancelado',
+};
+
 const PAYMENT_COLORS: Record<string, string> = {
   PENDING:  'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   APPROVED: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -17,15 +35,6 @@ const PAYMENT_LABELS: Record<string, string> = {
   APPROVED: 'Aprobado',
   REJECTED: 'Rechazado',
   REFUNDED: 'Reembolsado',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING:    'Pendiente',
-  CONFIRMED:  'Confirmado',
-  PROCESSING: 'En proceso',
-  READY:      'Listo',
-  DELIVERED:  'Entregado',
-  CANCELLED:  'Cancelado',
 };
 
 interface Props {
@@ -60,6 +69,18 @@ export function OrdersTable({ orders }: Props) {
               <th className="px-6 py-3 text-right font-medium">Ver</th>
             </tr>
           </thead>
+          <tbody className="divide-y divide-border">
+            {orders.map((order) => (
+              <tr key={order.id} className="hover:bg-section-tinted transition-colors">
+                <td className="px-6 py-4">
+                  <p className="font-mono text-xs font-bold text-nav-burgundy">
+                    #{order.id.slice(0, 8).toUpperCase()}
+                  </p>
+                  <p className="text-xs text-nav-purple/40 mt-0.5 font-mono">
+                    {order.userId.slice(0, 8)}…
+                  </p>
+                </td>
+                <td className="px-6 py-4 text-nav-purple/60 text-xs max-w-48">
           <tbody className="divide-y divide-border dark:divide-dm-secondary/20">
             {orders.map((order) => (
               <tr key={order.id} className="hover:bg-muted dark:hover:bg-[#3D3845] transition-colors">
@@ -124,7 +145,7 @@ export function OrdersTable({ orders }: Props) {
       {/* ── Mobile list ── */}
       <div className="sm:hidden divide-y divide-border dark:divide-dm-secondary/20">
         {orders.map((order) => (
-          <div key={order.id} className="flex items-center gap-3 px-4 py-3">
+          <div key={order.id} className="flex items-center gap-3 px-4 py-3.5">
             <div className="min-w-0 flex-1">
               <p className="font-mono text-sm font-semibold text-brand-burgundy dark:text-nav-burgundy">
                 #{order.id.slice(0, 8).toUpperCase()}
@@ -134,6 +155,11 @@ export function OrdersTable({ orders }: Props) {
                 <span className="font-medium">${Number(order.total).toLocaleString('es-AR')}</span>
               </p>
             </div>
+            <span
+              className={`shrink-0 inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-700'}`}
+            >
+              {STATUS_LABELS[order.status] ?? order.status}
+            </span>
             <button
               onClick={() => setSelected(order)}
               aria-label="Ver pedido"
@@ -145,10 +171,10 @@ export function OrdersTable({ orders }: Props) {
         ))}
       </div>
 
-      {/* ── Modal ── */}
+      {/* ── Detail modal ── */}
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
           onClick={() => setSelected(null)}
         >
           <div
@@ -172,8 +198,8 @@ export function OrdersTable({ orders }: Props) {
             </div>
 
             <div className="px-6 py-5 space-y-5">
-              {/* Status row */}
-              <div className="flex flex-wrap gap-3">
+              {/* Status edit + payment */}
+              <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Package className="h-4 w-4 text-[#A98EC5] dark:text-nav-burgundy" />
                   <span className="text-muted-foreground dark:text-[#F5E6F0]/60">Estado:</span>
@@ -182,7 +208,7 @@ export function OrdersTable({ orders }: Props) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <CreditCard className="h-4 w-4 text-[#A98EC5] dark:text-nav-burgundy" />
+                  <CreditCard className="h-4 w-4 text-brand-lilac-dark shrink-0" />
                   <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${PAYMENT_COLORS[selected.paymentStatus] ?? 'bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-300'}`}>
                     {PAYMENT_LABELS[selected.paymentStatus] ?? selected.paymentStatus}
                   </span>
@@ -191,10 +217,10 @@ export function OrdersTable({ orders }: Props) {
 
               {/* Items */}
               <div>
-                <p className="text-xs uppercase tracking-widest text-[#A98EC5] dark:text-nav-burgundy font-semibold mb-2">
+                <p className="text-xs uppercase tracking-widest text-brand-lilac-dark font-semibold mb-2">
                   Productos
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-2 rounded-xl bg-muted/50 p-3">
                   {selected.items.map((item) => (
                     <div key={item.id} className="flex items-center justify-between text-sm gap-4">
                       <div className="min-w-0">
