@@ -106,7 +106,11 @@ jobs:
           sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }}|" k8s/migration-job.yaml
           sed -i "s|\${CI_COMMIT_SHORT_SHA}|${SHORT_SHA}|g" k8s/migration-job.yaml
           kubectl apply -f k8s/migration-job.yaml
-          kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=120s job/${JOB_NAME}
+          if ! kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=300s job/${JOB_NAME}; then
+            echo "=== Migration job failed or timed out — pod logs: ==="
+            kubectl -n ${{ env.NAMESPACE }} logs job/${JOB_NAME} --tail=100 || true
+            exit 1
+          fi
 
   # ─── Deploy to k3s ─────────────────────────────────────────────────────────
   deploy:

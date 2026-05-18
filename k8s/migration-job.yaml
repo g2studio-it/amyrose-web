@@ -6,7 +6,7 @@ metadata:
   labels:
     app: migration
 spec:
-  backoffLimit: 3
+  backoffLimit: 0
   ttlSecondsAfterFinished: 300
   template:
     spec:
