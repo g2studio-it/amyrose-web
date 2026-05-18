@@ -112,6 +112,37 @@ export async function createAdminCategoryAction(data: {
   }
 }
 
+export async function updateAdminCategoryAction(
+  id: string,
+  data: {
+    name?: string;
+    slug?: string;
+    description?: string;
+    sortOrder?: number;
+    isActive?: boolean;
+  },
+): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.patch<ApiCategory>(`/catalog/categories/${id}`, data, token);
+    revalidatePath('/[locale]/admin/categories', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al actualizar categoría' };
+  }
+}
+
+export async function deleteAdminCategoryAction(id: string): Promise<{ error?: string }> {
+  try {
+    const token = await getAdminToken();
+    await api.delete(`/catalog/categories/${id}`, token);
+    revalidatePath('/[locale]/admin/categories', 'page');
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al eliminar categoría' };
+  }
+}
+
 function generateSlug(name: string): string {
   const base = name
     .toLowerCase()

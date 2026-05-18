@@ -69,18 +69,6 @@ export function OrdersTable({ orders }: Props) {
               <th className="px-6 py-3 text-right font-medium">Ver</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
-            {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-section-tinted transition-colors">
-                <td className="px-6 py-4">
-                  <p className="font-mono text-xs font-bold text-nav-burgundy">
-                    #{order.id.slice(0, 8).toUpperCase()}
-                  </p>
-                  <p className="text-xs text-nav-purple/40 mt-0.5 font-mono">
-                    {order.userId.slice(0, 8)}…
-                  </p>
-                </td>
-                <td className="px-6 py-4 text-nav-purple/60 text-xs max-w-48">
           <tbody className="divide-y divide-border dark:divide-dm-secondary/20">
             {orders.map((order) => (
               <tr key={order.id} className="hover:bg-muted dark:hover:bg-[#3D3845] transition-colors">
