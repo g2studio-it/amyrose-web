@@ -58,7 +58,7 @@ export function TransferForm({ order, locale }: Props) {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch('/api/upload-proof', { method: 'POST', body: formData });
+        const res = await fetch('/internal/upload-proof', { method: 'POST', body: formData });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? 'Error al subir el comprobante');
         await attachProofAction(order.id, data.url);

@@ -12,6 +12,10 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 export async function POST(req: NextRequest) {
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return NextResponse.json({ error: 'Cloudinary no está configurado en el servidor' }, { status: 503 });
+  }
+
   const session = await auth();
   if (!session || session.user?.role !== 'ADMIN') {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });

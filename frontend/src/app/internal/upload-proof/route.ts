@@ -12,6 +12,10 @@ const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export async function POST(req: NextRequest) {
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return NextResponse.json({ error: 'Cloudinary no está configurado en el servidor' }, { status: 503 });
+  }
+
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 });

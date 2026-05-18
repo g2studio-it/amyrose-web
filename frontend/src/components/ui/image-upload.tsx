@@ -33,7 +33,7 @@ export function ImageUpload({
       body.append('folder', folder);
 
       try {
-        const res = await fetch('/api/upload', { method: 'POST', body });
+        const res = await fetch('/internal/upload', { method: 'POST', body });
         const json = await res.json();
 
         if (!res.ok) {
