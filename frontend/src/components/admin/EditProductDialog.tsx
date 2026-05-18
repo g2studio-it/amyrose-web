@@ -433,14 +433,14 @@ export function EditProductDialog({ product, categories }: Props) {
 
       {/* Dialog */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
           {/* Overlay */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
           {/* Panel */}
-          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-card shadow-2xl" style={{ maxHeight: '92vh' }}>
+          <div className="relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl sm:rounded-2xl bg-card shadow-2xl" style={{ maxHeight: '94vh' }}>
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-border px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 sm:px-6 sm:py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#6B1A2B]/10">
                   <PackageOpen className="h-4 w-4 text-brand-burgundy" />
@@ -458,10 +458,10 @@ export function EditProductDialog({ product, categories }: Props) {
               </button>
             </div>
 
-            {/* Body — two columns */}
-            <div className="flex flex-1 overflow-hidden">
+            {/* Body — single column on mobile, two columns on md+ */}
+            <div className="flex flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
               {/* Left: basic info */}
-              <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-border px-5 py-5">
+              <div className="flex shrink-0 flex-col border-b border-border px-4 py-5 sm:px-5 md:w-72 md:overflow-y-auto md:border-b-0 md:border-r">
                 <div className="flex-1 space-y-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A98EC5]">
                     Información básica
@@ -557,7 +557,7 @@ export function EditProductDialog({ product, categories }: Props) {
               </div>
 
               {/* Right: images + variants */}
-              <div className="flex flex-1 flex-col overflow-y-auto px-5 py-5 space-y-6">
+              <div className="flex flex-1 flex-col space-y-6 px-4 py-5 sm:px-5 md:overflow-y-auto">
                 {/* Images */}
                 <div className="space-y-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A98EC5]">
