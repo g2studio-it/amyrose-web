@@ -1,7 +1,7 @@
 # =============================================================================
-# Deploy to k3s — Build, push, and deploy Amy Rose to your VPS k3s cluster
+# Deploy to k3s — Build images and open PR in GitOps repo (ArgoCD deploys)
 # =============================================================================
-name: "Deploy to k3s"
+name: "Build & Deploy"
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 env:
   IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/g2studio
-  NAMESPACE: amyrose
+  GITOPS_REPO: g2studio-it/k3s-g2studio-argocd
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -76,116 +76,39 @@ jobs:
           docker push ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }}
           docker push ${{ env.IMAGE }}:amyrose-backend-latest
 
-  # ─── Run Prisma Migrations ─────────────────────────────────────────────────
-  migrate:
-    name: "Run DB Migrations"
+  # ─── Open PR en GitOps repo — ArgoCD se encarga del deploy ────────────────
+  update-gitops:
+    name: "Update GitOps repo"
     runs-on: arc-runner-org
-    needs: build-frontend
+    needs: [build-frontend, build-backend]
+    env:
+      GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install kubectl
+      - name: Open PR in k3s-g2studio-argocd
         run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          BRANCH="deploy/amyrose-${SHORT_SHA}"
 
-      - name: Ensure Docker Hub pull secret exists
-        run: |
-          kubectl -n ${{ env.NAMESPACE }} create secret docker-registry dockerhub-pull \
-            --docker-server=https://index.docker.io/v1/ \
-            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
-            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
-            --dry-run=client -o yaml | kubectl apply -f -
+          git clone https://x-access-token:${GH_TOKEN}@github.com/${GITOPS_REPO}.git gitops
+          cd gitops
 
-      - name: Run migration job
-        run: |
-          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)
-          export JOB_NAME="prisma-migrate-${SHORT_SHA}"
-          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-migrator-${{ github.sha }}|" k8s/migration-job.yaml
-          sed -i "s|\${CI_COMMIT_SHORT_SHA}|${SHORT_SHA}|g" k8s/migration-job.yaml
-          kubectl apply -f k8s/migration-job.yaml
-          kubectl -n ${{ env.NAMESPACE }} wait --for=condition=complete --timeout=120s job/${JOB_NAME}
+          git config user.email "ci@g2studio.it.com"
+          git config user.name "G2Studio CI"
+          git checkout -b "$BRANCH"
 
-  # ─── Deploy to k3s ─────────────────────────────────────────────────────────
-  deploy:
-    name: "Deploy to k3s"
-    runs-on: arc-runner-org
-    needs: [build-frontend, build-backend, migrate]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+          sed -i "s|newTag: amyrose-frontend-.*|newTag: amyrose-frontend-${{ github.sha }}|" \
+            projects/amyrose-web/frontend/kustomization.yaml
 
-      - name: Install kubectl
-        run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
+          sed -i "s|newTag: amyrose-backend-.*|newTag: amyrose-backend-${{ github.sha }}|" \
+            projects/amyrose-web/backend/kustomization.yaml
 
-      - name: Set image in manifests
-        run: |
-          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-frontend-${{ github.sha }}|" k8s/frontend.yaml
-          sed -i "s|image: .*|image: ${{ env.IMAGE }}:amyrose-backend-${{ github.sha }}|" k8s/backend.yaml
+          git add projects/amyrose-web/
+          git commit -m "deploy: amyrose → ${SHORT_SHA}"
+          git push origin "$BRANCH"
 
-      - name: Inject secrets into k8s manifests
-        run: |
-          cp k8s/secrets.yaml k8s/secrets-rendered.yaml
-          sed -i "s|\${DATABASE_URL}|${{ secrets.DATABASE_URL }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${DB_HOST}|${{ secrets.DB_HOST }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${DB_PORT}|${{ secrets.DB_PORT }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${DB_USERNAME}|${{ secrets.DB_USERNAME }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${DB_NAME}|${{ secrets.DB_NAME }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${AUTH_SECRET}|${{ secrets.AUTH_SECRET }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${AUTH_URL}|${{ secrets.AUTH_URL }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${JWT_SECRET}|${{ secrets.JWT_SECRET }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${JWT_REFRESH_SECRET}|${{ secrets.JWT_REFRESH_SECRET }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${MERCADOPAGO_ACCESS_TOKEN}|${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${MERCADOPAGO_WEBHOOK_SECRET}|${{ secrets.MERCADOPAGO_WEBHOOK_SECRET }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}|${{ secrets.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${CLOUDINARY_CLOUD_NAME}|${{ secrets.CLOUDINARY_CLOUD_NAME }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${CLOUDINARY_API_KEY}|${{ secrets.CLOUDINARY_API_KEY }}|g" k8s/secrets-rendered.yaml
-          sed -i "s|\${CLOUDINARY_API_SECRET}|${{ secrets.CLOUDINARY_API_SECRET }}|g" k8s/secrets-rendered.yaml
-
-      - name: Render ClusterIssuer manifest
-        run: |
-          cp k8s/clusterissuer.yaml k8s/clusterissuer-rendered.yaml
-          sed -i "s|\${LETSENCRYPT_EMAIL}|${{ secrets.LETSENCRYPT_EMAIL }}|g" k8s/clusterissuer-rendered.yaml
-
-      - name: Create Docker Hub pull secret
-        run: |
-          kubectl -n ${{ env.NAMESPACE }} create secret docker-registry dockerhub-pull \
-            --docker-server=https://index.docker.io/v1/ \
-            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
-            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
-            --dry-run=client -o yaml | kubectl apply -f -
-
-      - name: Apply Kubernetes manifests
-        run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/clusterissuer-rendered.yaml
-          kubectl apply -f k8s/secrets-rendered.yaml
-          kubectl apply -f k8s/postgres.yaml
-          kubectl apply -f k8s/backend.yaml
-          kubectl apply -f k8s/frontend.yaml
-          kubectl apply -f k8s/ingress.yaml
-
-      - name: Wait for rollouts
-        run: |
-          kubectl rollout status deployment/backend -n ${{ env.NAMESPACE }} --timeout=120s
-          kubectl rollout status deployment/frontend -n ${{ env.NAMESPACE }} --timeout=120s
-
-      - name: Verify deployment
-        run: |
-          echo "=== Deployments ==="
-          kubectl get deployments -n ${{ env.NAMESPACE }}
-          echo ""
-          echo "=== Pods ==="
-          kubectl get pods -n ${{ env.NAMESPACE }}
-          echo ""
-          echo "=== Services ==="
-          kubectl get svc -n ${{ env.NAMESPACE }}
-          echo ""
-          echo "=== Ingress ==="
-          kubectl get ingress -n ${{ env.NAMESPACE }}
+          gh pr create \
+            --repo ${GITOPS_REPO} \
+            --title "deploy: amyrose → ${SHORT_SHA}" \
+            --body "Triggered by [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" \
+            --base main \
+            --head "$BRANCH"
